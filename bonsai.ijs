@@ -3,7 +3,9 @@ require 'stats/base stats/distribs'
 
 budget=: 1
 benchN=: 6!:2"1 @ (# ,:)~
-bonsai=: benchN [: <. budget % 6!:2
+bonsai=: benchN 1000 <. [: <. budget % 6!:2
+
+
 
 NB. jackknife
 jkmean=: (-~ +/) % <:@#
@@ -73,7 +75,22 @@ NB. bootstrap confidence bias corrected percentile
 NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
+NB. this has wider intervals but tbh does better wrt reruns. bspi is
+NB. highly optimistic
 bsbc=: 1 : 0
+'B a'=. x
+that=. mean samp=. u dobootstrap B y
+z0=. qnorm that quantileinv samp
+ab=. pnorm (+: z0) + (qnorm (,-.) -: a)
+ab quantile samp
+)
+
+NB. bootstrap confidence bias corrected percentile
+NB. u is parameter to estimate
+NB. y is sample
+NB. x is bootstrap iterations B and confidence parameter alpha
+bsca=: 1 : 0
+NB. todo
 'B a'=. x
 that=. mean samp=. u dobootstrap B y
 z0=. qnorm that quantileinv samp
