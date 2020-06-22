@@ -24,6 +24,16 @@ ws=. (%+/)"1 -. | xs -"0 1 is =. (<.,>.)"0 xs =. x * <:#y
 ws (+/"1 @: *) is { /:~ y
 )
 
+quantileinv=: #@] %~ [ I.~ /:~@]
+
+NB. quantileinv=: 4 : 0
+NB. y =. /:~ y
+NB. is =. y I. x
+NB. vs =. ((,. <:) is) { y
+NB. ws =. {."1 (-/"1 vs) %~ | x -"0 1 vs
+NB. (is-ws) % #y
+NB. )
+
 box=: (+ [: (,~ -) 1.5 * -~/) @: (0.25 0.75&quantile)
 
 qquantile=: 1 : '(m %~ i.&.<: m)&quantile'
@@ -38,8 +48,37 @@ dobootstrap=: 2 : 0
 u"1 y {~ ? n # ,: $~ #y
 )
 
-stdbootstrap=: 2 : 0
-mean`stddev`:0 u dobootstrap v y
+NB. bootstrap confidence standard
+NB. u is parameter to estimate
+NB. y is sample
+NB. x is bootstrap iterations B and confidence parameter alpha
+bssi=: 1 : 0
+'B a'=. x
+samp=. (u dobootstrap B) y
+sig=. stddev samp
+uhat=. mean samp
+uhat -`+`:0 sig * qnorm -. -: a
+)
+
+NB. bootstrap confidence percentile
+NB. u is parameter to estimate
+NB. y is sample
+NB. x is bootstrap iterations B and confidence parameter alpha
+bspi=: 1 : 0
+'B a'=. x
+((,-.) -: -. a) quantile (u dobootstrap B) y
+)
+
+NB. bootstrap confidence bias corrected percentile
+NB. u is parameter to estimate
+NB. y is sample
+NB. x is bootstrap iterations B and confidence parameter alpha
+bsbc=: 1 : 0
+'B a'=. x
+that=. mean samp=. u dobootstrap B y
+z0=. qnorm that quantileinv samp
+ab=. pnorm (+: z0) + (qnorm (,-.) -: a)
+z0 ; ab ; ab quantile samp
 )
 
 NB. confidence interval z(0.95) => qnorm -: &. -. 0.95
@@ -66,11 +105,5 @@ NB. where P* is probability computed according to bootstrap dist.
 NB. easiest method is to take quantiles of G^-1(a), G^-1(1-a) for desired a.
 NB. called percentile method
 
-NB. confidence interval boostrap percentile
-NB. m is alpha
-NB. y is bootstrap sample
-cibp=: 1 : 0
-u;x;y NB. todo
-)
 
 NB. most of the info comes from https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815, a survey paper by efron and tibshirani
