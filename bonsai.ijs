@@ -33,7 +33,14 @@ percentiles=: 100 qquantile
 regress=: %. (1 ,.~ i.@#)
 NB. tacitquantile=: ([: (% +/)"1 [: -. [: | ([ * [: <: [: # ]) -"0 1 [: (<. , >.)"0 [ * [: <: [: # ]) +/"1@:* ([: (<. , >.)"0 [ * [: <: [: # ]) { [: /:~ ]
 
+NB. u is parameter, n is bootstrap B, y is sample
+dobootstrap=: 2 : 0
+u"1 y {~ ? n # ,: $~ #y
+)
 
+stdbootstrap=: 2 : 0
+mean`stddev`:0 u dobootstrap v y
+)
 
 NB. confidence interval z(0.95) => qnorm -: &. -. 0.95
 NB. estimate parameter theta by theta^ +/ sigma^*z(a)
