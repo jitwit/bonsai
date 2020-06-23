@@ -5,8 +5,6 @@ budget=: 1
 benchN=: 6!:2"1 @ (# ,:)~
 bonsai=: benchN 1000 <. [: <. budget % 6!:2
 
-
-
 NB. jackknife
 jkmean=: (-~ +/) % <:@#
 jkdev=: -"_1 jkmean
@@ -42,7 +40,7 @@ qquantile=: 1 : '(m %~ i.&.<: m)&quantile'
 quartiles=: 4 qquantile
 percentiles=: 100 qquantile
 
-regress=: %. (1 ,.~ i.@#)
+regress=: %. (1 ,. i.@#)
 NB. tacitquantile=: ([: (% +/)"1 [: -. [: | ([ * [: <: [: # ]) -"0 1 [: (<. , >.)"0 [ * [: <: [: # ]) +/"1@:* ([: (<. , >.)"0 [ * [: <: [: # ]) { [: /:~ ]
 
 NB. u is parameter, n is bootstrap B, y is sample
@@ -97,30 +95,5 @@ z0=. qnorm that quantileinv samp
 ab=. pnorm (+: z0) + (qnorm (,-.) -: a)
 z0 ; ab ; ab quantile samp
 )
-
-NB. confidence interval z(0.95) => qnorm -: &. -. 0.95
-NB. estimate parameter theta by theta^ +/ sigma^*z(a)
-NB. this is the standard method
-NB. the precentile method uses G^(-1)(alpha)
-
-NB. efron : B of ~ 50-200 is usually adequate
-za=: qnorm @ (-: &. -.)
-
-tanh=: 7&o.
-tanhinv=: tanh ^: _1
-
-NB. confidence interval standard
-NB. m coverage
-NB. x estimated parameter
-NB. y standard error on estimated parameter
-cis=: 1 : 'x -`+`:0 y * za m'
-
-NB. bootstrapping
-NB. G^(s) parametric cdf of theta^*, ie
-NB. G^(s) = P*{theta^* < s}
-NB. where P* is probability computed according to bootstrap dist.
-NB. easiest method is to take quantiles of G^-1(a), G^-1(1-a) for desired a.
-NB. called percentile method
-
 
 NB. most of the info comes from https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815, a survey paper by efron and tibshirani
