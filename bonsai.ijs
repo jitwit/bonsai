@@ -18,9 +18,15 @@ jkvarp=: jkdev % <:@#
 jkvar=: jkdev % # - 2:
 jkstddev=: %: @ jkvar
 jkstddevp=: %: @ jkvarp
+stder=: %:@:(var % #)
+
+NB. general but slow 1-jackknife
+jkgen1s=: 1 : '1 u\. y'
+
+tstat2=: -&mean % %: @ +&%&#
 
 quantile=: 4 : 0
-ws=. (%+/)"1 -. | xs -"0 1 is =. (<.,>.)"0 xs =. x * <:#y
+ws=. (%+/)"1 -. | xs -"0 1 is=. (<.,>.)"0 xs=. x * <:#y
 ws (+/"1 @: *) is { /:~ y
 )
 
@@ -66,15 +72,13 @@ NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bspi=: 1 : 0
 'B a'=. x
-((,-.) -: -. a) quantile (u dobootstrap B) y
+((,-.) -: a) quantile (u dobootstrap B) y
 )
 
 NB. bootstrap confidence bias corrected percentile
 NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
-NB. this has wider intervals but tbh does better wrt reruns. bspi is
-NB. highly optimistic
 bsbc=: 1 : 0
 'B a'=. x
 that=. mean samp=. u dobootstrap B y
