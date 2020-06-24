@@ -103,9 +103,22 @@ ab=. pnorm zah,zbh
 ab quantile resamp
 )
 
-NB. most of the info comes from https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815, a survey paper by efron and tibshirani
-
-eg=: '%. ? 200 200 $ 0'
+regress_bench=: +/\ %. 1 ,. i.@#
+rsquare_bench=: 3 : 0
+v=. 1,.i.#y
+d=. +/\ y
+b=. d %. v
+k=. <:{:$v
+n=. $d
+sst=. +/*:d-(+/d) % #d
+sse=. +/*:d-v +/ .* b
+mse=. sse%n->:k
+seb=. %:({.mse)*(<0 1)|:%.(|:v) +/ .* v
+ssr=. sst-sse
+msr=. ssr%k
+rsq=. ssr%sst
+rsq
+)
 
 dobench=: 3 : 0
   samp=. bonsai y
@@ -127,21 +140,4 @@ dobench=: 3 : 0
   rep=. ('N = ',":#samp);'ols';'R^2';'mean';'stddev'
   rep=. rep ,. lows ,. est ,. ups
   rep
-)
-
-regress_bench=: +/\ %. 1 ,. i.@#
-rsquare_bench=: 3 : 0
-v=. 1,.i.#y
-d=. +/\ y
-b=. d %. v
-k=. <:{:$v
-n=. $d
-sst=. +/*:d-(+/d) % #d
-sse=. +/*:d-v +/ .* b
-mse=. sse%n->:k
-seb=. %:({.mse)*(<0 1)|:%.(|:v) +/ .* v
-ssr=. sst-sse
-msr=. ssr%k
-rsq=. ssr%sst
-rsq
 )
