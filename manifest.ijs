@@ -1,11 +1,11 @@
 CAPTION=: 'statistical benchmarks with confidence'
 
 DESCRIPTION=: 0 : 0
-Bootstrapping for benchmarks in J with confidence.
+bootstrapping for benchmarks in J with confidence
 
-Inspired by: https://hackage.haskell.org/package/criterion
+inspired by https://hackage.haskell.org/package/criterion
 
-Informed by:
+informed by
 https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815 a survey paper by efron and tibshirani
 https://web.stanford.edu/~hastie/CASI/ book by efron and hasti
 )
@@ -27,4 +27,3 @@ bonsai.ijs
 test.ijs
 run.ijs
 )
-
