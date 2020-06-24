@@ -1,11 +1,11 @@
 
-#+begin_src j :session :exports output
+#+begin_src j :session :exports results
 load 'manifest.ijs'
 ];._2 DESCRIPTION
 #+end_src
 
 #+RESULTS:
-: bootstrapping for benchmarks in J with confidence                                                                   
+: bootstrapping benchmarks in J for confidence                                                                        
 :                                                                                                                     
 : inspired by https://hackage.haskell.org/package/criterion                                                           
 :                                                                                                                     
@@ -23,14 +23,14 @@ bonsai '%. ? 200 200 $ 0'
 #+RESULTS:
 #+begin_example
 ┌───────┬──────────┬───────────┬───────────┐
-│N = 223│lower     │estimate   │upper      │
+│N = 166│lower     │estimate   │upper      │
 ├───────┼──────────┼───────────┼───────────┤
-│ols    │0.00158881│0.00158516 │0.00163383 │
+│ols    │0.00160696│0.00162159 │0.00165985 │
 ├───────┼──────────┼───────────┼───────────┤
-│R^2    │0.99985   │0.999933   │0.999994   │
+│R^2    │0.999823  │0.999772   │0.999986   │
 ├───────┼──────────┼───────────┼───────────┤
-│mean   │0.00158795│0.00160335 │0.00162939 │
+│mean   │0.00160966│0.00162811 │0.00165715 │
 ├───────┼──────────┼───────────┼───────────┤
-│stddev │5.36297e_5│0.000150465│0.000227535│
+│stddev │9.0649e_5 │0.000155264│0.000210908│
 └───────┴──────────┴───────────┴───────────┘
 #+end_example
