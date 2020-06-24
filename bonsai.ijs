@@ -1,5 +1,5 @@
 coclass 'bonsai'
-require 'stats/base stats/distribs'
+require 'stats/base stats/distribs plot'
 
 budget=: 1
 benchN=: 6!:2"1 @ (# ,:)~
@@ -29,9 +29,10 @@ quantile=: 4 : 0
 ws=. (%+/)"1 -. | xs -"0 1 is=. (<.,>.)"0 xs=. x * <:#y
 ws (+/"1 @: *) is { /:~ y
 )
+NB. tacitquantile=: ([: (% +/)"1 [: -. [: | ([ * [: <: [: # ]) -"0 1 [: (<. , >.)"0 [ * [: <: [: # ]) +/"1@:* ([: (<. , >.)"0 [ * [: <: [: # ]) { [: /:~ ]
+
 
 quantileinv=: #@] %~ [ I.~ /:~@]
-
 NB. quantileinv=: 4 : 0
 NB. y =. /:~ y
 NB. is =. y I. x
@@ -45,9 +46,6 @@ box=: (+ [: (,~ -) 1.5 * -~/) @: (0.25 0.75&quantile)
 qquantile=: 1 : '(m %~ i.&.<: m)&quantile'
 quartiles=: 4 qquantile
 percentiles=: 100 qquantile
-
-regress=: %. (1 ,. i.@#)
-NB. tacitquantile=: ([: (% +/)"1 [: -. [: | ([ * [: <: [: # ]) -"0 1 [: (<. , >.)"0 [ * [: <: [: # ]) +/"1@:* ([: (<. , >.)"0 [ * [: <: [: # ]) { [: /:~ ]
 
 NB. u is parameter, n is bootstrap B, y is sample
 dobootstrap=: 2 : 0
@@ -91,13 +89,61 @@ NB. bootstrap confidence bias corrected percentile
 NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
-bsca=: 1 : 0
 NB. todo
+bsca=: 1 : 0
 'B a'=. x
-that=. mean samp=. u dobootstrap B y
+that=. mean resamp=. u dobootstrap B y
+ahat=. skewness resamp
 z0=. qnorm that quantileinv samp
-ab=. pnorm (+: z0) + (qnorm (,-.) -: a)
-z0 ; ab ; ab quantile samp
+zb=. qnorm -. -: a
+zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
+za=. qnorm -: a
+zah=. z0 + (z0+za) % 1 - ahat * z0+za
+ab=. pnorm zah,zbh
+ab quantile resamp
 )
 
 NB. most of the info comes from https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815, a survey paper by efron and tibshirani
+
+
+
+eg=: '%. ? 70 70 $ 0'
+
+dobench=: 3 : 0
+  samp=. bonsai y
+  xbar=. mean samp
+  sdev=. stddev samp
+  rega=. {: regress_bench samp
+  rsqr=. rsquare_bench samp
+  
+  est=. 'estimate';rega;rsqr;xbar;sdev
+
+  xbarc=. (1000;0.05) mean bsbc samp
+  sdevc=. (1000;0.05) stddev bsbc samp
+  regac=. (1000;0.05) ({:@regress_bench) bsbc samp
+  rsqrc=. (1000;0.05) rsquare_bench bsbc samp
+  confs=. regac , rsqrc , xbarc ,: sdevc
+  lows=. 'lower' ; <"0 {."1 confs
+  ups=. 'upper' ; <"0 {:"1 confs
+  
+  rep=. ('N = ',":#samp);'ols';'R^2';'mean';'stddev'
+  rep=. rep ,. lows ,. est ,. ups
+  rep
+)
+
+regress_bench=: +/\ %. 1 ,. i.@#
+rsquare_bench=: 3 : 0
+v=. 1,.i.#y
+d=. +/\ y
+b=. d %. v
+k=. <:{:$v
+n=. $d
+sst=. +/*:d-(+/d) % #d
+sse=. +/*:d-v +/ .* b
+mse=. sse%n->:k
+seb=. %:({.mse)*(<0 1)|:%.(|:v) +/ .* v
+ssr=. sst-sse
+msr=. ssr%k
+rsq=. ssr%sst
+rsq
+)
