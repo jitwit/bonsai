@@ -82,7 +82,7 @@ bsbc=: 1 : 0
 that=. mean samp=. u dobootstrap B y
 z0=. qnorm that quantileinv samp
 ab=. pnorm (+: z0) + (qnorm (,-.) -: a)
-ab quantile samp
+({.,that,{:) ab quantile samp
 )
 
 NB. bootstrap confidence bias corrected percentile
@@ -122,24 +122,16 @@ rsq
 
 bonsai=: 3 : 0
   samp=. dobench y
-  xbar=. mean samp
-  sdev=. stddev samp
-  rega=. {: regress_bench samp
-  rsqr=. rsquare_bench samp
-  
-  est=. 'estimate';rega;rsqr;xbar;sdev
 
   xbarc=. (1000;0.05) mean bsbc samp
   sdevc=. (1000;0.05) stddev bsbc samp
   regac=. (1000;0.05) ({:@regress_bench) bsbc samp
   rsqrc=. (1000;0.05) rsquare_bench bsbc samp
-  confs=. regac , rsqrc , xbarc ,: sdevc
-  lows=. 'lower' ; <"0 {."1 confs
-  ups=. 'upper' ; <"0 {:"1 confs
-  
-  rep=. ('N = ',":#samp);'ols';'R^2';'mean';'stddev'
-  rep=. rep ,. lows ,. est ,. ups
-  rep
+  ests=. <"0 regac , rsqrc , xbarc ,: sdevc
+  ests=. (;: 'lower estimate upper') , ests
+
+  rows=. ('N = ',":#samp);'ols';'R^2';'mean';'stddev'
+  rows ,. ests
 )
 
 NB. export to z locale
