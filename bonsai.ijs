@@ -3,7 +3,7 @@ require 'stats/base stats/distribs plot'
 
 budget=: 1
 benchN=: 6!:2"1 @ (# ,:)~
-bonsai=: benchN 1000 <. [: <. budget % 6!:2
+bonsai=: benchN 5 >. 1000 <. [: <. budget % 6!:2
 
 NB. jackknife
 jkmean=: (-~ +/) % <:@#
@@ -105,9 +105,7 @@ ab quantile resamp
 
 NB. most of the info comes from https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815, a survey paper by efron and tibshirani
 
-
-
-eg=: '%. ? 70 70 $ 0'
+eg=: '%. ? 200 200 $ 0'
 
 dobench=: 3 : 0
   samp=. bonsai y
