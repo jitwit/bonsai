@@ -3,7 +3,7 @@ require 'stats/base stats/distribs plot'
 
 budget=: 1
 benchN=: 6!:2"1 @ (# ,:)~
-bonsai=: benchN 5 >. 1000 <. [: <. budget % 6!:2
+dobench=: benchN 5 >. 1000 <. [: <. budget % 6!:2
 
 NB. jackknife
 jkmean=: (-~ +/) % <:@#
@@ -120,8 +120,8 @@ rsq=. ssr%sst
 rsq
 )
 
-dobench=: 3 : 0
-  samp=. bonsai y
+bonsai=: 3 : 0
+  samp=. dobench y
   xbar=. mean samp
   sdev=. stddev samp
   rega=. {: regress_bench samp
@@ -141,3 +141,7 @@ dobench=: 3 : 0
   rep=. rep ,. lows ,. est ,. ups
   rep
 )
+
+NB. export to z locale
+bonsai_z_=: bonsai_bonsai_
+

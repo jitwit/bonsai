@@ -1,16 +1,14 @@
 CAPTION=: 'statistical benchmarks with confidence'
 
 DESCRIPTION=: 0 : 0
-bootstrapping for benchmarks in J with confidence
+bootstrapping benchmarks in J for confidence
 
 inspired by https://hackage.haskell.org/package/criterion
 
-informed by
-https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815 a survey paper by efron and tibshirani
-https://web.stanford.edu/~hastie/CASI/ book by efron and hasti
+informed by https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815 and https://web.stanford.edu/~hastie/CASI/
 )
 
-VERSION=: '1.0.0'
+VERSION=: '1.0.1'
 
 RELEASE=: 'j902'
 

@@ -1,0 +1,36 @@
+
+#+begin_src j :session :exports output
+load 'manifest.ijs'
+];._2 DESCRIPTION
+#+end_src
+
+#+RESULTS:
+: bootstrapping for benchmarks in J with confidence                                                                   
+:                                                                                                                     
+: inspired by https://hackage.haskell.org/package/criterion                                                           
+:                                                                                                                     
+: informed by https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815 and https://web.stanford.edu/~hastie/CASI/
+
+* Example
+
+#+begin_src j :session :exports both :sit 1
+require'bonsai.ijs'
+
+NB. benchmark inverting 200x200 random matrix entries in [0,1]
+bonsai '%. ? 200 200 $ 0'
+#+end_src
+
+#+RESULTS:
+#+begin_example
+┌───────┬──────────┬───────────┬───────────┐
+│N = 223│lower     │estimate   │upper      │
+├───────┼──────────┼───────────┼───────────┤
+│ols    │0.00158881│0.00158516 │0.00163383 │
+├───────┼──────────┼───────────┼───────────┤
+│R^2    │0.99985   │0.999933   │0.999994   │
+├───────┼──────────┼───────────┼───────────┤
+│mean   │0.00158795│0.00160335 │0.00162939 │
+├───────┼──────────┼───────────┼───────────┤
+│stddev │5.36297e_5│0.000150465│0.000227535│
+└───────┴──────────┴───────────┴───────────┘
+#+end_example
