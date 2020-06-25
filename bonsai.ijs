@@ -18,7 +18,7 @@ jkvarp=: jkdev % <:@#
 jkvar=: jkdev % # - 2:
 jkstddev=: %: @ jkvar
 jkstddevp=: %: @ jkvarp
-stder=: %:@:(var % #)
+stder=: %: @: (var % #)
 
 NB. general but slow 1-jackknife
 jkgen1s=: 1 : '1 u\. y'
@@ -127,13 +127,14 @@ bonsai=: 3 : 0
   sdevc=. (1000;0.05) stddev bsbc samp
   regac=. (1000;0.05) ({:@regress_bench) bsbc samp
   rsqrc=. (1000;0.05) rsquare_bench bsbc samp
-  ests=. <"0 regac , rsqrc , xbarc ,: sdevc
+  skwnc=. (1000;0.05) skewness bsbc samp
+  kurtc=. (1000;0.05) kurtosis bsbc samp
+  ests=. <"0 regac , rsqrc , xbarc , sdevc , skwnc ,: kurtc
   ests=. (;: 'lower estimate upper') , ests
 
-  rows=. ('N = ',":#samp);'ols';'R^2';'mean';'stddev'
+  rows=. ('N = ',":#samp);'ols';('R',u:16b00b2);'mean';'stddev';'skewness';'kurtosis'
   rows ,. ests
 )
 
 NB. export to z locale
 bonsai_z_=: bonsai_bonsai_
-
