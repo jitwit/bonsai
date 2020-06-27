@@ -1,17 +1,4 @@
 
-#+begin_src j :session :exports results
-load 'manifest.ijs'
-];._2 DESCRIPTION
-#+end_src
-
-#+RESULTS:
-: bootstrapping benchmarks in J for confidence                                                                        
-:                                                                                                                     
-: inspired by https://hackage.haskell.org/package/criterion                                                           
-:                                                                                                                     
-: informed by https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815 and https://web.stanford.edu/~hastie/CASI/
-
-* Example
 
 #+begin_src j :session :exports both :sit 1
 load 'bonsai.ijs'
@@ -23,15 +10,25 @@ bonsai '%. ? 200 200 $ 0'
 
 #+RESULTS:
 #+begin_example
-┌───────┬──────────┬──────────┬───────────┐
-│N = 342│lower     │estimate  │upper      │
-├───────┼──────────┼──────────┼───────────┤
-│ols    │0.00151567│0.00152333│0.00153499 │
-├───────┼──────────┼──────────┼───────────┤
-│R^2    │0.999963  │0.999993  │0.999998   │
-├───────┼──────────┼──────────┼───────────┤
-│mean   │0.00151631│0.00152347│0.00153401 │
-├───────┼──────────┼──────────┼───────────┤
-│stddev │4.25677e_5│7.77916e_5│0.000120104│
-└───────┴──────────┴──────────┴───────────┘
+┌────────┬──────────┬──────────┬───────────┐
+│N = 234 │lower     │estimate  │upper      │
+├────────┼──────────┼──────────┼───────────┤
+│ols     │0.00150935│0.00151921│0.00153613 │
+├────────┼──────────┼──────────┼───────────┤
+│R²      │0.999937  │0.999987  │0.999996   │
+├────────┼──────────┼──────────┼───────────┤
+│mean    │0.00150897│0.00151903│0.00153421 │
+├────────┼──────────┼──────────┼───────────┤
+│stddev  │4.19322e_5│9.19037e_5│0.000136144│
+├────────┼──────────┼──────────┼───────────┤
+│skewness│0.0918703 │3.567     │10.041     │
+├────────┼──────────┼──────────┼───────────┤
+│kurtosis│0.495325  │32.0026   │138.827    │
+└────────┴──────────┴──────────┴───────────┘
 #+end_example
+
+confidence in benchmarks through bootstrapping in J
+
+inspired by https://hackage.haskell.org/package/criterion                                                           
+
+informed by https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815 and https://web.stanford.edu/~hastie/CASI/

@@ -1,9 +1,9 @@
 coclass 'bonsai'
 require 'stats/base stats/distribs plot'
 
-budget=: 1
-benchN=: 6!:2"1 @ (# ,:)~
-dobench=: benchN 5 >. 1000 <. [: <. budget % 6!:2
+bench_time =: 1
+bootstrap_config=: 1000;0.05
+dobench=: 6!:2"1@(# ,:)~ (5 >. 1000 <. [: <. bench_time % 6!:2)
 
 NB. jackknife
 jkmean=: (-~ +/) % <:@#
@@ -29,17 +29,8 @@ quantile=: 4 : 0
 ws=. (%+/)"1 -. | xs -"0 1 is=. (<.,>.)"0 xs=. x * <:#y
 ws (+/"1 @: *) is { /:~ y
 )
-NB. tacitquantile=: ([: (% +/)"1 [: -. [: | ([ * [: <: [: # ]) -"0 1 [: (<. , >.)"0 [ * [: <: [: # ]) +/"1@:* ([: (<. , >.)"0 [ * [: <: [: # ]) { [: /:~ ]
-
 
 quantileinv=: #@] %~ [ I.~ /:~@]
-NB. quantileinv=: 4 : 0
-NB. y =. /:~ y
-NB. is =. y I. x
-NB. vs =. ((,. <:) is) { y
-NB. ws =. {."1 (-/"1 vs) %~ | x -"0 1 vs
-NB. (is-ws) % #y
-NB. )
 
 box=: (+ [: (,~ -) 1.5 * -~/) @: (0.25 0.75&quantile)
 
@@ -48,20 +39,18 @@ quartiles=: 4 qquantile
 percentiles=: 100 qquantile
 
 NB. u is parameter, n is bootstrap B, y is sample
-dobootstrap=: 2 : 0
-u"1 y {~ ? n # ,: $~ #y
-)
+dobootstrap=: 2 : 'u"1 y {~ ? n # ,: $~ #y'
 
 NB. bootstrap confidence standard
 NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bssi=: 1 : 0
-'B a'=. x
-samp=. (u dobootstrap B) y
-sig=. stddev samp
-uhat=. mean samp
-uhat -`+`:0 sig * qnorm -. -: a
+  'B a'=. x
+  samp=. (u dobootstrap B) y
+  sig=. stddev samp
+  uhat=. mean samp
+  uhat -`+`:0 sig * qnorm -. -: a
 )
 
 NB. bootstrap confidence percentile
@@ -69,8 +58,8 @@ NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bspi=: 1 : 0
-'B a'=. x
-((,-.) -: a) quantile (u dobootstrap B) y
+  'B a'=. x
+  ((,-.) -: a) quantile (u dobootstrap B) y
 )
 
 NB. bootstrap confidence bias corrected percentile
@@ -78,11 +67,11 @@ NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bsbc=: 1 : 0
-'B a'=. x
-that=. mean samp=. u dobootstrap B y
-z0=. qnorm that quantileinv samp
-ab=. pnorm (+: z0) + (qnorm (,-.) -: a)
-({.,that,{:) ab quantile samp
+  'B a'=. x
+  that=. mean samp=. u dobootstrap B y
+  z0=. qnorm that quantileinv samp
+  ab=. pnorm (+: z0) + (qnorm (,-.) -: a)
+  ({.,that,{:) ab quantile samp
 )
 
 NB. bootstrap confidence bias corrected percentile
@@ -123,16 +112,17 @@ rsq
 bonsai=: 3 : 0
   samp=. dobench y
 
-  xbarc=. (1000;0.05) mean bsbc samp
-  sdevc=. (1000;0.05) stddev bsbc samp
-  regac=. (1000;0.05) ({:@regress_bench) bsbc samp
-  rsqrc=. (1000;0.05) rsquare_bench bsbc samp
-  skwnc=. (1000;0.05) skewness bsbc samp
-  kurtc=. (1000;0.05) kurtosis bsbc samp
+  xbarc=. bootstrap_config mean bsbc samp
+  sdevc=. bootstrap_config stddev bsbc samp
+  regac=. bootstrap_config ({:@regress_bench) bsbc samp
+  rsqrc=. bootstrap_config rsquare_bench bsbc samp
+  skwnc=. bootstrap_config skewness bsbc samp
+  kurtc=. bootstrap_config kurtosis bsbc samp
   ests=. <"0 regac , rsqrc , xbarc , sdevc , skwnc ,: kurtc
   ests=. (;: 'lower estimate upper') , ests
 
   rows=. ('N = ',":#samp);'ols';('R',u:16b00b2);'mean';'stddev';'skewness';'kurtosis'
+  NB. ((<y) , a:#~<:{:$ests)
   rows ,. ests
 )
 
