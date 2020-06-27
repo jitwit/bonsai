@@ -2,7 +2,7 @@ coclass 'bonsai'
 require 'stats/base stats/distribs plot'
 
 bench_time =: 1
-bootstrap_config=: 1000;0.05
+bsconfig=: 1000;0.05
 dobench=: 6!:2"1@(# ,:)~ (5 >. 1000 <. [: <. bench_time % 6!:2)
 
 NB. jackknife
@@ -111,13 +111,14 @@ rsq
 
 bonsai=: 3 : 0
   samp=. dobench y
+NB.  bssamp=. samp {~ ? (0{::bsconfig) # ,: $~ #samp
 
-  xbarc=. bootstrap_config mean bsbc samp
-  sdevc=. bootstrap_config stddev bsbc samp
-  regac=. bootstrap_config ({:@regress_bench) bsbc samp
-  rsqrc=. bootstrap_config rsquare_bench bsbc samp
-  skwnc=. bootstrap_config skewness bsbc samp
-  kurtc=. bootstrap_config kurtosis bsbc samp
+  xbarc=. bsconfig mean bsbc samp
+  sdevc=. bsconfig stddev bsbc samp
+  regac=. bsconfig ({:@regress_bench) bsbc samp
+  rsqrc=. bsconfig rsquare_bench bsbc samp
+  skwnc=. bsconfig skewness bsbc samp
+  kurtc=. bsconfig kurtosis bsbc samp
   ests=. <"0 regac , rsqrc , xbarc , sdevc , skwnc ,: kurtc
   ests=. (;: 'lower estimate upper') , ests
 
