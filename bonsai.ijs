@@ -1,4 +1,4 @@
-load 'stats/bonsai/jbonsai.ijs'
+load '~addons/stats/bonsai/jbonsai.ijs'
 cocurrent 'bonsai'
 coinsert 'jbonsai'
 
