@@ -1,4 +1,4 @@
-coinsert'bonsai'
+load'bonsai.ijs jackknife.ijs'
 
 test_cases=: 0 : 0
 NB. jackknife
@@ -17,3 +17,4 @@ NB. quantile
 test=: 3 : 0
 0!:2 test_cases
 )
+

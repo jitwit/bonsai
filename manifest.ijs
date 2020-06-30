@@ -22,5 +22,4 @@ graphics/plot
 
 FILES=: 0 : 0
 bonsai.ijs
-jbonsai.ijs
 )
