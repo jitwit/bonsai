@@ -74,22 +74,22 @@ bsbc=: 1 : 0
   ({.,that,{:) ab quantile samp
 )
 
-NB. bootstrap confidence bias corrected percentile
+NB. bootstrap confidence bias corrected percentile accelerated
 NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
-NB. todo
-bsca=: 1 : 0
-'B a'=. x
-that=. mean resamp=. u dobootstrap B y
-ahat=. skewness resamp
-z0=. qnorm that quantileinv samp
-zb=. qnorm -. -: a
-zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
-za=. qnorm -: a
-zah=. z0 + (z0+za) % 1 - ahat * z0+za
-ab=. pnorm zah,zbh
-ab quantile resamp
+bsbca=: 1 : 0
+  'B a'=. x
+  that=. mean samp=. u dobootstrap B y
+  dti=. (jkmean samp) - that
+  ahat=. 1r6 * (+/dti^3) % (+/*:dti)^3r2
+  z0=. qnorm that quantileinv samp
+  zb=. qnorm -. -: a
+  zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
+  za=. qnorm -: a
+  zah=. z0 + (z0+za) % 1 - ahat * z0+za
+  ab=. pnorm zah,zbh
+  ({.,that,{:) ab quantile samp
 )
 
 regress_bench=: +/\ %. 1 ,. i.@#
@@ -111,19 +111,17 @@ rsq
 
 bonsai=: 3 : 0
   samp=. dobench y
-NB.  bssamp=. samp {~ ? (0{::bsconfig) # ,: $~ #samp
 
-  xbarc=. bsconfig mean bsbc samp
-  sdevc=. bsconfig stddev bsbc samp
-  regac=. bsconfig ({:@regress_bench) bsbc samp
-  rsqrc=. bsconfig rsquare_bench bsbc samp
-  skwnc=. bsconfig skewness bsbc samp
-  kurtc=. bsconfig kurtosis bsbc samp
+  xbarc=. bsconfig mean bsbca samp
+  sdevc=. bsconfig stddev bsbca samp
+  regac=. bsconfig ({:@regress_bench) bsbca samp
+  rsqrc=. bsconfig rsquare_bench bsbca samp
+  skwnc=. bsconfig skewness bsbca samp
+  kurtc=. bsconfig kurtosis bsbca samp
   ests=. <"0 regac , rsqrc , xbarc , sdevc , skwnc ,: kurtc
   ests=. (;: 'lower estimate upper') , ests
 
   rows=. ('N = ',":#samp);'ols';('R',u:16b00b2);'mean';'stddev';'skewness';'kurtosis'
-  NB. ((<y) , a:#~<:{:$ests)
   rows ,. ests
 )
 
