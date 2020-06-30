@@ -77,9 +77,9 @@ NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bsbca=: 1 : 0
+  thati=. (- mean) 1 u \. y
+  ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
   that=. mean samp=. u dobootstrap bs_B y
-  dti=. (jkmean samp) - that
-  ahat=. 1r6 * (+/dti^3) % (+/*:dti)^3r2
   z0=. qnorm that quantileinv samp
   zb=. qnorm -. -: bs_a
   zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
