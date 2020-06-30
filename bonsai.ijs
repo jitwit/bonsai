@@ -1,4 +1,4 @@
-require 'stats/bonsai/jbonsai'
+load 'stats/bonsai/jbonsai.ijs'
 cocurrent 'bonsai'
 coinsert 'jbonsai'
 
