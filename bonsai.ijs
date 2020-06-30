@@ -4,6 +4,7 @@ require 'stats/base stats/distribs plot'
 bs_1rn =: 1 NB. bs time budget based on first run
 bs_a =: 0.05 NB. bs confidence
 bs_B =: 2000 NB. bs iters
+bs_est =: bsbca
 dobench=: 6!:2"1@(# ,:)~ (5 >. 1000 <. [: <. bs_1rn % 6!:2)
 
 NB. jackknife
@@ -109,12 +110,12 @@ rsq
 bonsai=: 3 : 0
   samp=. dobench y
 
-  xbarc=. mean bsbca samp
-  sdevc=. stddev bsbca samp
-  regac=. ({:@regress_bench) bsbca samp
-  rsqrc=. rsquare_bench bsbca samp
-  skwnc=. skewness bsbca samp
-  kurtc=. kurtosis bsbca samp
+  xbarc=. mean bs_est samp
+  sdevc=. stddev bs_est samp
+  regac=. ({:@regress_bench) bs_est samp
+  rsqrc=. rsquare_bench bs_est samp
+  skwnc=. skewness bs_est samp
+  kurtc=. kurtosis bs_est samp
   ests=. <"0 regac , rsqrc , xbarc , sdevc , skwnc ,: kurtc
   ests=. (;: 'lower estimate upper') , ests
 
