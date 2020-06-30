@@ -1,9 +1,10 @@
 coclass 'bonsai'
 require 'stats/base stats/distribs plot'
 
-bench_time =: 1
-bsconfig=: 1000;0.05
-dobench=: 6!:2"1@(# ,:)~ (5 >. 1000 <. [: <. bench_time % 6!:2)
+bs_1rn =: 1 NB. bs time budget based on first run
+bs_a =: 0.05 NB. bs confidence
+bs_B =: 2000 NB. bs iters
+dobench=: 6!:2"1@(# ,:)~ (5 >. 1000 <. [: <. bs_1rn % 6!:2)
 
 NB. jackknife
 jkmean=: (-~ +/) % <:@#
@@ -46,11 +47,10 @@ NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bssi=: 1 : 0
-  'B a'=. x
-  samp=. (u dobootstrap B) y
+  samp=. (u dobootstrap bs_B) y
   sig=. stddev samp
   uhat=. mean samp
-  uhat -`+`:0 sig * qnorm -. -: a
+  uhat -`+`:0 sig * qnorm -. -: bs_a
 )
 
 NB. bootstrap confidence percentile
@@ -58,8 +58,7 @@ NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bspi=: 1 : 0
-  'B a'=. x
-  ((,-.) -: a) quantile (u dobootstrap B) y
+  ((,-.) -: bs_a) quantile (u dobootstrap bs_B) y
 )
 
 NB. bootstrap confidence bias corrected percentile
@@ -67,10 +66,9 @@ NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bsbc=: 1 : 0
-  'B a'=. x
-  that=. mean samp=. u dobootstrap B y
+  that=. mean samp=. u dobootstrap bs_B y
   z0=. qnorm that quantileinv samp
-  ab=. pnorm (+: z0) + (qnorm (,-.) -: a)
+  ab=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
   ({.,that,{:) ab quantile samp
 )
 
@@ -79,14 +77,13 @@ NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bsbca=: 1 : 0
-  'B a'=. x
-  that=. mean samp=. u dobootstrap B y
+  that=. mean samp=. u dobootstrap bs_B y
   dti=. (jkmean samp) - that
   ahat=. 1r6 * (+/dti^3) % (+/*:dti)^3r2
   z0=. qnorm that quantileinv samp
-  zb=. qnorm -. -: a
+  zb=. qnorm -. -: bs_a
   zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
-  za=. qnorm -: a
+  za=. qnorm -: bs_a
   zah=. z0 + (z0+za) % 1 - ahat * z0+za
   ab=. pnorm zah,zbh
   ({.,that,{:) ab quantile samp
@@ -112,12 +109,12 @@ rsq
 bonsai=: 3 : 0
   samp=. dobench y
 
-  xbarc=. bsconfig mean bsbca samp
-  sdevc=. bsconfig stddev bsbca samp
-  regac=. bsconfig ({:@regress_bench) bsbca samp
-  rsqrc=. bsconfig rsquare_bench bsbca samp
-  skwnc=. bsconfig skewness bsbca samp
-  kurtc=. bsconfig kurtosis bsbca samp
+  xbarc=. mean bsbca samp
+  sdevc=. stddev bsbca samp
+  regac=. ({:@regress_bench) bsbca samp
+  rsqrc=. rsquare_bench bsbca samp
+  skwnc=. skewness bsbca samp
+  kurtc=. kurtosis bsbca samp
   ests=. <"0 regac , rsqrc , xbarc , sdevc , skwnc ,: kurtc
   ests=. (;: 'lower estimate upper') , ests
 
