@@ -22,6 +22,5 @@ graphics/plot
 
 FILES=: 0 : 0
 bonsai.ijs
-test.ijs
-run.ijs
+jbonsai.ijs
 )

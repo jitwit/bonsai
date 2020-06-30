@@ -2,4 +2,4 @@ require 'jbonsai'
 cocurrent 'bonsai'
 coinsert 'jbonsai'
 
-bonsai_z_ =: bonsai_jbonsai_
+bonsai_z_ =: jbonsai_jbonsai_
