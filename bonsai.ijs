@@ -1,7 +1,7 @@
 require 'stats/base stats/distribs plot'
 
 bs_1rn =: 1 NB. bs time budget based on first run
-bs_a =: 0.05 NB. bs confidence
+bs_a =: 0.1 NB. bs confidence
 bs_B =: 2000 NB. bs iters
 dobench=: 6!:2"1@(# ,:)~ (5 >. 1000 <. [: <. bs_1rn % 6!:2)
 
@@ -17,6 +17,7 @@ NB. box=: (+ [: (,~ -) 1.5 * -~/) @: (0.25 0.75&quantile)
 qquantile=: 1 : '(m %~ i.&.<: m)&quantile'
 quartiles=: 4 qquantile
 percentiles=: 100 qquantile
+IQR=: 0.25 0.75&quantile
 
 NB. u is parameter, n is bootstrap B, y is sample
 dobootstrap=: 2 : 'u"1 y {~ ? n # ,: $~ #y'
@@ -88,7 +89,7 @@ rsq
 NB. use bs bias corrected accelerated by default
 bs_est =: bsbca
 
-bonsai1=: 3 : 0
+bonsai=: 3 : 0
   samp=. dobench y
 
   xbarc=. mean bs_est samp
