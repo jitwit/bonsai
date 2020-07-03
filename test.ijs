@@ -12,6 +12,7 @@ NB. quantile
 (0.5&quantile -: median) 1 1 3 2
 (0.5&quantile -: median) 1 1 3 2 1
 (0.5&quantile -: median) 1 1 3 2 1 2
+(1.8 2 2.2 quantileinv 1 2 3 2 1) -: 0.4 0.8 0.8
 )
 
 test=: 3 : 0

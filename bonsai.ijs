@@ -5,12 +5,12 @@ bs_a =: 0.1 NB. bs confidence
 bs_B =: 2000 NB. bs iters
 dobench=: 6!:2"1@(# ,:)~ (5 >. 1000 <. [: <. bs_1rn % 6!:2)
 
-quantile=: 4 : 0
+disc_cdf=: 4 : 0
 ws=. (%+/)"1 -. | xs -"0 1 is=. (<.,>.)"0 xs=. x * <:#y
 ws (+/"1 @: *) is { /:~ y
 )
 
-quantileinv=: <:/~ % #@]
+quantile =: disc_cdf :. (+/ @: (<:/~) % #@])
 
 NB. box=: (+ [: (,~ -) 1.5 * -~/) @: (0.25 0.75&quantile)
 
@@ -47,7 +47,7 @@ NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bsbc=: 1 : 0
   that=. mean samp=. u dobootstrap bs_B y
-  z0=. qnorm that quantileinv samp
+  z0=. qnorm that quantile^:_1 samp
   ab=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
   ({.,that,{:) ab quantile samp
 )
@@ -60,7 +60,7 @@ bsbca=: 1 : 0
   thati=. (- mean) 1 u \. y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
   that=. mean samp=. u dobootstrap bs_B y
-  z0=. qnorm that quantileinv samp
+  z0=. qnorm that quantile^:_1 samp
   zb=. qnorm -. -: bs_a
   zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
   za=. qnorm -: bs_a
