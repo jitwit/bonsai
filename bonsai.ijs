@@ -89,8 +89,10 @@ rsq
 NB. use bs bias corrected accelerated by default
 bs_est =: bsbca
 
-bonsai=: 3 : 0
-  samp=. dobench y
+NB. report some descriptive statistics about a single vector y of
+NB. benchmark results.
+summarize1=: 3 : 0
+  samp=. y
 
   xbarc=. mean bs_est samp
   sdevc=. stddev bs_est samp
@@ -104,3 +106,6 @@ bonsai=: 3 : 0
   rows=. ('N = ',":#samp);'ols';('R',u:16b00b2);'mean';'stddev';'skewness';'kurtosis'
   rows ,. ests
 )
+
+NB. run bencharks then report
+bonsai=: summarize1@dobench
