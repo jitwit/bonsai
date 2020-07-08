@@ -158,7 +158,7 @@ bootstrapped standard error and asking for coverage based on the
 normal distribution cdf.
 
 #+name: standard-interval
-#+begin_src j :session :exports both
+#+begin_src j :session :exports code
 NB. monad producing adverb where u is statistic and y is sample.
 bssi=: 1 : 0
   samp=. (u dobootstrap bs_B) y
@@ -180,7 +180,7 @@ The next best way to go is to use percentiles on the emperical
 resamples to find our confidence.
 
 #+name: percentile
-#+begin_src j :session :exports both
+#+begin_src j :session :exports code
 NB. monad producing adverb where u is statistic and y is sample.
 bspi=: 1 : 0
   ((,-.) -: bs_a) quantile (u dobootstrap bs_B) y
@@ -201,14 +201,14 @@ mapping through the standard normal cdf $\Phi$ getting the desired
 coverage and then calculatin percentiles.
 
 #+name: bias-percentile
-#+begin_src j :session :exports both
+#+begin_src j :session :exports code
 NB. monad producing adverb where u is statistic and y is sample.
 bsbc=: 1 : 0
   that=. u y
   samp=. u dobootstrap bs_B y
   z0=. qnorm p0=. that quantile^:_1 samp
-  I=. ({.,0.5,{:) pnorm (+: z0) + (qnorm (,-.) -: bs_a)
-  I quantile samp
+  I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
+  ({.,(mean samp),{:) I quantile samp
 )
 #+end_src
 
@@ -222,6 +222,22 @@ $$z_0=\Phi^{-1} (p_0)$$ $$\hat\theta_{\text{BC}}[\alpha] = \hat F^{-1}
 When the bootstrap resamples are median unbiased (ie $p_0 = 0.5$) then
 $z_0=0$ and this agrees with the simple percentile interval.
 
-** Accelerated Bias-corrected Percentile Interval
+** Bias-corrected and Accelerated Percentile Interval
 
-todo
+#+name: bias-and-accelerated
+#+begin_src j :session :exports code
+NB. monad producing adverb where u is statistic and y is sample.
+bsbca=: 1 : 0
+  thati=. (- mean) 1 u \. y
+  ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
+  that=. mean samp=. u dobootstrap bs_B y
+  z0=. qnorm that quantile^:_1 samp
+  zb=. qnorm -. -: bs_a
+  zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
+  za=. qnorm -: bs_a
+  zah=. z0 + (z0+za) % 1 - ahat * z0+za
+  ({.,that,{:) (pnorm zah,zbh) quantile samp
+)
+#+end_src
+
+#+RESULTS: bias-and-accelerated

@@ -47,8 +47,8 @@ bsbc=: 1 : 0
   that=. u y
   samp=. u dobootstrap bs_B y
   z0=. qnorm p0=. that quantile^:_1 samp
-  I=. ({.,0.5,{:) pnorm (+: z0) + (qnorm (,-.) -: bs_a)
-  I quantile samp
+  I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
+  ({.,that,{:) I quantile samp
 )
 
 NB. bootstrap confidence bias corrected percentile accelerated
@@ -64,8 +64,7 @@ bsbca=: 1 : 0
   zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
   za=. qnorm -: bs_a
   zah=. z0 + (z0+za) % 1 - ahat * z0+za
-  ab=. pnorm zah,zbh
-  ({.,that,{:) ab quantile samp
+  ({.,that,{:) (pnorm zah,zbh) quantile samp
 )
 
 regress_bench=: +/\ %. 1 ,. i.@#

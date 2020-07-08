@@ -1,12 +1,12 @@
-- [Background](#org8ec0dee)
-  - [Bootstrapping through resampling](#org870b009)
-- [Initial Sample and Configuration](#org030ef81)
-- [Statistical Algorithms](#orgb22024b)
-- [Bootstrapping Confidence](#org4433656)
-  - [Standard Interval](#org3731cd9)
-  - [Percentile Interval](#orge8879d7)
-  - [Bias-corrected Percentile Interval](#org96c6090)
-  - [Accelerated Bias-corrected Percentile Interval](#orgbf9ea9a)
+- [Background](#org1e22c19)
+  - [Bootstrapping through resampling](#org09169f8)
+- [Initial Sample and Configuration](#orgb6cb81f)
+- [Statistical Algorithms](#org207d180)
+- [Bootstrapping Confidence](#orgc2bb7bc)
+  - [Standard Interval](#org961b48e)
+  - [Percentile Interval](#org6d7265c)
+  - [Bias-corrected Percentile Interval](#orgc0bc03c)
+  - [Bias-corrected and Accelerated Percentile Interval](#org167a365)
 
 This is a **`J`** program which does some statistical analysis of computer benchmark results. This is also a collection of notes so that I may recall what I learned while writing this script.
 
@@ -15,7 +15,7 @@ I mostly wanted a way to know which changes I was making to `J` programs were ac
 The main method used is bootstrapping, which enables the estimation of statistical parameters on nonparametric samples. I got the sense of what to look for from haskell's [criterion](https://hackage.haskell.org/package/criterion) package, and learned the material for how to implement it through Efron and Hastie's textbook [Computer Age Statistical Inference](https://web.stanford.edu/~hastie/CASI/). See chapters 10 and 11 from there to get the original material.
 
 
-<a id="org8ec0dee"></a>
+<a id="org1e22c19"></a>
 
 # Background
 
@@ -24,7 +24,7 @@ We have a sample \(x = (x_i)\) of benchmark results, which we (slightly dubiousl
 Some of these benchmarks will be expensive to run and in general it won't be possible to gather a large sample. To that end, the process of statistical bootsrapping allows us to extrapolate better estimates on the statistics through resampling uniformly from \(x\). Moreover, this process allows us to calculate standard errors on the statics as well as to attach confidence intervals to these computed statistics. And for our purposes, perhpas the most crucial aspect is that nothing need be assumed or known about the underlying distrubiton and that the computations are automatic.
 
 
-<a id="org870b009"></a>
+<a id="org09169f8"></a>
 
 ## Bootstrapping through resampling
 
@@ -37,7 +37,7 @@ Basically, the process is getting a sample \(x\) from some unknown distribution 
 The final step in the above process is akin to running another algorithm \(\text{Sd}(\hat F) = \hat{\text{se}}\) on the bootstrap resample and is called the <span class="underline">ideal bootstrap estimate</span> of the standard error. We can, however, do better inference and construct confidence intervals on the \(\hat\theta^*\).
 
 
-<a id="org030ef81"></a>
+<a id="orgb6cb81f"></a>
 
 # Initial Sample and Configuration
 
@@ -61,7 +61,7 @@ dobootstrap=: 2 : 'u"1 y {~ ? n # ,: $~ #y'
 ```
 
 
-<a id="orgb22024b"></a>
+<a id="org207d180"></a>
 
 # Statistical Algorithms
 
@@ -95,14 +95,14 @@ meadian =: 0.5 & quantile
 The local variables `is` and `ws` are used to interpolate between values at neighboring indices so that for example `0.5 discrete_cdf 0 3` and `median 0 3` agree and are both `1.5`. Declaring quantile as a function with obverse is cute but technically not valid. The delcared obverse counts how many elements of `y` are less than or equal to `x`.
 
 
-<a id="org4433656"></a>
+<a id="orgc2bb7bc"></a>
 
 # Bootstrapping Confidence
 
 Corresponds to Chapter 11 of casi textbook. Throughout, goal is to estimate the unseen statistic \(\theta\) from the bootstrap resample \(\hat\theta^*\)
 
 
-<a id="org3731cd9"></a>
+<a id="org961b48e"></a>
 
 ## Standard Interval
 
@@ -119,7 +119,7 @@ bssi=: 1 : 0
 In other words for 95% coverage the estimate for \(\theta\) is inside interval \(\hat \theta \pm 1.96 \cdot \hat {\text{se}}\). 1.96 comes from cdf of standard normal distribution \(\Phi^{-1}(0.975)\). The 0.975 comes from \(1 - \frac{\alpha}{2}\) and our \(\alpha\) is configured through the variable `bs_a`.
 
 
-<a id="orge8879d7"></a>
+<a id="org6d7265c"></a>
 
 ## Percentile Interval
 
@@ -135,7 +135,7 @@ bspi=: 1 : 0
 In other words, we estimate \(\theta\) from the bootstrap cdf \(\hat F\), and get the interval \(\hat F^{-1}[\frac{\alpha}{2},1 - \frac{\alpha}{2}]\). In J the base interval is cutely calculated by hooking `(,-.) -: bs_a`.
 
 
-<a id="org96c6090"></a>
+<a id="orgc0bc03c"></a>
 
 ## Bias-corrected Percentile Interval
 
@@ -147,8 +147,8 @@ bsbc=: 1 : 0
   that=. u y
   samp=. u dobootstrap bs_B y
   z0=. qnorm p0=. that quantile^:_1 samp
-  I=. ({.,0.5,{:) pnorm (+: z0) + (qnorm (,-.) -: bs_a)
-  I quantile samp
+  I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
+  ({.,(mean samp),{:) I quantile samp
 )
 ```
 
@@ -157,8 +157,21 @@ The above corresponds to \[p_0=\frac{\#\{\hat\theta^{*b} \le \hat \theta\}}{B}\]
 When the bootstrap resamples are median unbiased (ie \(p_0 = 0.5\)) then \(z_0=0\) and this agrees with the simple percentile interval.
 
 
-<a id="orgbf9ea9a"></a>
+<a id="org167a365"></a>
 
-## Accelerated Bias-corrected Percentile Interval
+## Bias-corrected and Accelerated Percentile Interval
 
-todo
+```j
+NB. monad producing adverb where u is statistic and y is sample.
+bsbca=: 1 : 0
+  thati=. (- mean) 1 u \. y
+  ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
+  that=. mean samp=. u dobootstrap bs_B y
+  z0=. qnorm that quantile^:_1 samp
+  zb=. qnorm -. -: bs_a
+  zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
+  za=. qnorm -: bs_a
+  zah=. z0 + (z0+za) % 1 - ahat * z0+za
+  ({.,that,{:) (pnorm zah,zbh) quantile samp
+)
+```
