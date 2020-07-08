@@ -28,9 +28,7 @@ NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bssi=: 1 : 0
   samp=. (u dobootstrap bs_B) y
-  sig=. stddev samp
-  uhat=. mean samp
-  uhat -`+`:0 sig * qnorm -. -: bs_a
+  (mean samp) -`+`:0 (stddev samp) * qnorm -. -: bs_a
 )
 
 NB. bootstrap confidence percentile

@@ -17,9 +17,9 @@ hides variability and range of the performance of ~y~.
 
 The main method used is bootstrapping, which enables the estimation of
 statistical parameters on nonparametric samples. I got the sense of
-what to look for from haskell's criterion package, and learned the
+what to look for from haskell's [[https://hackage.haskell.org/package/criterion][criterion]] package, and learned the
 material for how to implement it through Efron and Hastie's textbook
-Computer age statistical inference. See chapters 10 and 11 from there
+[[https://web.stanford.edu/~hastie/CASI/][Computer Age Statistical Inference]]. See chapters 10 and 11 from there
 to get the original material.
 
 * Background
