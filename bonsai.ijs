@@ -46,10 +46,11 @@ NB. u is parameter to estimate
 NB. y is sample
 NB. x is bootstrap iterations B and confidence parameter alpha
 bsbc=: 1 : 0
-  that=. mean samp=. u dobootstrap bs_B y
-  z0=. qnorm that quantile^:_1 samp
-  ab=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
-  ({.,that,{:) ab quantile samp
+  that=. u y
+  samp=. u dobootstrap bs_B y
+  z0=. qnorm p0=. that quantile^:_1 samp
+  I=. ({.,0.5,{:) pnorm (+: z0) + (qnorm (,-.) -: bs_a)
+  I quantile samp
 )
 
 NB. bootstrap confidence bias corrected percentile accelerated

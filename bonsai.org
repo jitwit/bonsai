@@ -132,6 +132,8 @@ ws (+/"1 @: *) is { /:~ y
 )
 
 quantile =: discrete_cdf :. (+/ @: (<:/~) % #@])
+
+meadian =: 0.5 & quantile
 #+end_src
 
 #+RESULTS: quantile
@@ -144,8 +146,82 @@ obverse counts how many elements of ~y~ are less than or equal to ~x~.
 
 * Bootstrapping Confidence
 
+Corresponds to Chapter 11 of casi textbook. Throughout, goal is to
+estimate the unseen statistic $\theta$ from the bootstrap resample
+$\hat\theta^*$
+
 ** Standard Interval
 
 The simplest but least accurate way of stamping a condience interval
 on the resampled statistics $\hat\theta^*$ is by taking the
-bootstrapped standard error and asking for coverage 
+bootstrapped standard error and asking for coverage based on the
+normal distribution cdf.
+
+#+name: standard-interval
+#+begin_src j :session :exports both
+NB. monad producing adverb where u is statistic and y is sample.
+bssi=: 1 : 0
+  samp=. (u dobootstrap bs_B) y
+  (mean samp) -`+`:0 (stddev samp) * qnorm -. -: bs_a
+)
+#+end_src
+
+#+RESULTS: standard-interval
+
+In other words for 95% coverage the estimate for $\theta$ is inside
+interval $\hat \theta \pm 1.96 \cdot \hat {\text{se}}$. 1.96 comes
+from cdf of standard normal distribution $\Phi^{-1}(0.975)$. The 0.975
+comes from $1 - \frac{\alpha}{2}$ and our $\alpha$ is configured
+through the variable ~bs_a~.
+
+** Percentile Interval
+
+The next best way to go is to use percentiles on the emperical
+resamples to find our confidence.
+
+#+name: percentile
+#+begin_src j :session :exports both
+NB. monad producing adverb where u is statistic and y is sample.
+bspi=: 1 : 0
+  ((,-.) -: bs_a) quantile (u dobootstrap bs_B) y
+)
+#+end_src
+
+In other words, we estimate $\theta$ from the bootstrap cdf $\hat F$,
+and get the interval $\hat F^{-1}[\frac{\alpha}{2},1 -
+\frac{\alpha}{2}]$. In J the base interval is cutely calculated by
+hooking ~(,-.) -: bs_a~.
+
+** Bias-corrected Percentile Interval
+
+The resamples may skew more heavily to one side or the other of $\hat
+\theta$. To correct for this, we look at the percentile of the it in
+the resample then derive the bounds on the confidence interval by
+mapping through the standard normal cdf $\Phi$ getting the desired
+coverage and then calculatin percentiles.
+
+#+name: bias-percentile
+#+begin_src j :session :exports both
+NB. monad producing adverb where u is statistic and y is sample.
+bsbc=: 1 : 0
+  that=. u y
+  samp=. u dobootstrap bs_B y
+  z0=. qnorm p0=. that quantile^:_1 samp
+  I=. ({.,0.5,{:) pnorm (+: z0) + (qnorm (,-.) -: bs_a)
+  I quantile samp
+)
+#+end_src
+
+#+RESULTS: bias-percentile
+
+The above corresponds to
+$$p_0=\frac{\#\{\hat\theta^{*b} \le \hat \theta\}}{B}$$
+$$z_0=\Phi^{-1} (p_0)$$ $$\hat\theta_{\text{BC}}[\alpha] = \hat F^{-1}
+[\Phi (2\cdot z_0 + z^{(\alpha)})]$$
+
+When the bootstrap resamples are median unbiased (ie $p_0 = 0.5$) then
+$z_0=0$ and this agrees with the simple percentile interval.
+
+** Accelerated Bias-corrected Percentile Interval
+
+todo
