@@ -207,7 +207,8 @@ coverage and then calculating percentiles.
 #+begin_src j :session :exports code
 NB. monad producing adverb where u is statistic and y is sample.
 bsbc=: 1 : 0
-  that =. mean samp=. u dobootstrap bs_B y
+  that =. u y
+  samp=. u dobootstrap bs_B y
   z0=. qnorm p0=. that quantile^:_1 samp
   I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
   ({.,(mean samp),{:) I quantile samp
@@ -217,7 +218,7 @@ bsbc=: 1 : 0
 #+RESULTS: bias-percentile
 
 The above corresponds to
-$$p_0=\frac{\#\{\hat\theta^{*b} \le \hat \theta^*\}}{B}$$
+$$p_0=\frac{\#\{\hat\theta^{*b} \le \hat \theta\}}{B}$$
 $$z_0=\Phi^{-1} (p_0)$$ $$\hat\theta_{\text{BC}}[\alpha] = \hat F^{-1}
 [\Phi (2\cdot z_0 + z^{(\alpha)})]$$
 

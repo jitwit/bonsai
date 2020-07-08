@@ -33,7 +33,8 @@ bspi=: 1 : 0
 
 NB. monad producing adverb where u is statistic and y is sample.
 bsbc=: 1 : 0
-  that =. mean samp=. u dobootstrap bs_B y
+  that =. u y
+  samp=. u dobootstrap bs_B y
   z0=. qnorm p0=. that quantile^:_1 samp
   I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
   ({.,(mean samp),{:) I quantile samp
