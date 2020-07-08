@@ -1,0 +1,30 @@
+
+Statistical benchmarking in J.
+
+See either the org file [[bonsai.org][bonsai]] or better yet head to
+[[http://j-raphael.net/posts/bonsai.html][j-raphael.net/posts/bonsai.html]] as git renders the markdown with
+mangled math formulas.
+
+#+begin_src j :session :exports both :sit 3
+load 'stats/bonsai'
+bonsai '%. ? 50 50 $ 0'
+#+end_src
+
+#+RESULTS:
+#+begin_example
+┌────────┬──────────┬──────────┬──────────┐
+│N = 1000│lower     │estimate  │upper     │
+├────────┼──────────┼──────────┼──────────┤
+│ols     │8.89257e_5│8.93233e_5│8.98327e_5│
+├────────┼──────────┼──────────┼──────────┤
+│R²      │0.999979  │0.999994  │0.999997  │
+├────────┼──────────┼──────────┼──────────┤
+│mean    │8.8941e_5 │8.93163e_5│8.97914e_5│
+├────────┼──────────┼──────────┼──────────┤
+│stddev  │5.7112e_6 │7.72787e_6│9.90091e_6│
+├────────┼──────────┼──────────┼──────────┤
+│skewness│1.88648   │4.74615   │9.35584   │
+├────────┼──────────┼──────────┼──────────┤
+│kurtosis│15.7851   │52.365    │157.658   │
+└────────┴──────────┴──────────┴──────────┘
+#+end_example

@@ -1,60 +1,45 @@
-require 'stats/base stats/distribs plot'
+load 'plot stats/base stats/distribs'
 
-bs_1rn =: 1 NB. bs time budget based on first run
-bs_a =: 0.1 NB. bs confidence
-bs_B =: 2000 NB. bs iters
-dobench=: 6!:2"1@(# ,:)~ (5 >. 1000 <. [: <. bs_1rn % 6!:2)
+bs_1rn  =: 1      NB. time alloted (upper bound on)
+bs_n_lo =: 5      NB. minimum sample
+bs_n_hi =: 1000   NB. maximum sample
+bs_a    =: 0.1    NB. coverage
+bs_B    =: 2000   NB. bootstrap resample
 
-disc_cdf=: 4 : 0
+NB. monad taking prgram y to run a number of times based on configuration
+dobench=: 6!:2"1@(# ,:)~ (bs_n_lo >. bs_n_hi <. [: <. bs_1rn % 6!:2)
+NB. u is parameter, n is bootstrap B, y is sample
+dobootstrap=: 2 : 'u"1 y {~ ? n # ,: $~ #y'
+
+discrete_cdf=: 4 : 0
 ws=. (%+/)"1 -. | xs -"0 1 is=. (<.,>.)"0 xs=. x * <:#y
 ws (+/"1 @: *) is { /:~ y
 )
 
-quantile =: disc_cdf :. (+/ @: (<:/~) % #@])
+quantile =: discrete_cdf :. (+/ @: (<:/~) % #@])
 
-NB. box=: (+ [: (,~ -) 1.5 * -~/) @: (0.25 0.75&quantile)
+meadian =: 0.5 & quantile
 
-qquantile=: 1 : '(m %~ i.&.<: m)&quantile'
-quartiles=: 4 qquantile
-percentiles=: 100 qquantile
-IQR=: 0.25 0.75&quantile
-
-NB. u is parameter, n is bootstrap B, y is sample
-dobootstrap=: 2 : 'u"1 y {~ ? n # ,: $~ #y'
-
-NB. bootstrap confidence standard
-NB. u is parameter to estimate
-NB. y is sample
-NB. x is bootstrap iterations B and confidence parameter alpha
+NB. monad producing adverb where u is statistic and y is sample.
 bssi=: 1 : 0
   samp=. (u dobootstrap bs_B) y
   (mean samp) -`+`:0 (stddev samp) * qnorm -. -: bs_a
 )
 
-NB. bootstrap confidence percentile
-NB. u is parameter to estimate
-NB. y is sample
-NB. x is bootstrap iterations B and confidence parameter alpha
+NB. monad producing adverb where u is statistic and y is sample.
 bspi=: 1 : 0
   ((,-.) -: bs_a) quantile (u dobootstrap bs_B) y
 )
 
-NB. bootstrap confidence bias corrected percentile
-NB. u is parameter to estimate
-NB. y is sample
-NB. x is bootstrap iterations B and confidence parameter alpha
+NB. monad producing adverb where u is statistic and y is sample.
 bsbc=: 1 : 0
-  that=. u y
-  samp=. u dobootstrap bs_B y
+  that =. mean samp=. u dobootstrap bs_B y
   z0=. qnorm p0=. that quantile^:_1 samp
   I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
-  ({.,that,{:) I quantile samp
+  ({.,(mean samp),{:) I quantile samp
 )
 
-NB. bootstrap confidence bias corrected percentile accelerated
-NB. u is parameter to estimate
-NB. y is sample
-NB. x is bootstrap iterations B and confidence parameter alpha
+NB. monad producing adverb where u is statistic and y is sample.
 bsbca=: 1 : 0
   thati=. (- mean) 1 u \. y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
@@ -69,19 +54,19 @@ bsbca=: 1 : 0
 
 regress_bench=: +/\ %. 1 ,. i.@#
 rsquare_bench=: 3 : 0
-v=. 1,.i.#y
-d=. +/\ y
-b=. d %. v
-k=. <:{:$v
-n=. $d
-sst=. +/*:d-(+/d) % #d
-sse=. +/*:d-v +/ .* b
-mse=. sse%n->:k
-seb=. %:({.mse)*(<0 1)|:%.(|:v) +/ .* v
-ssr=. sst-sse
-msr=. ssr%k
-rsq=. ssr%sst
-rsq
+  v=. 1,.i.#y
+  d=. +/\ y
+  b=. d %. v
+  k=. <:{:$v
+  n=. $d
+  sst=. +/*:d-(+/d) % #d
+  sse=. +/*:d-v +/ .* b
+  mse=. sse%n->:k
+  seb=. %:({.mse)*(<0 1)|:%.(|:v) +/ .* v
+  ssr=. sst-sse
+  msr=. ssr%k
+  rsq=. ssr%sst
+  rsq
 )
 
 NB. use bs bias corrected accelerated by default
@@ -89,7 +74,7 @@ bs_est =: bsbca
 
 NB. report some descriptive statistics about a single vector y of
 NB. benchmark results.
-summarize1=: 3 : 0
+bs_summarize =: 3 : 0
   samp=. y
 
   xbarc=. mean bs_est samp
@@ -106,4 +91,4 @@ summarize1=: 3 : 0
 )
 
 NB. run bencharks then report
-bonsai=: summarize1@dobench
+bonsai=: bs_summarize @ dobench

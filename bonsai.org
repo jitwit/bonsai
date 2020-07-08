@@ -1,74 +1,76 @@
 #+title: Bonsai
 #+subtitle: Statistical Benchmarking in J
 #+OPTIONS: author:nil num:nil
+#+HTML_HEAD: <link rel="stylesheet" href="../format/css.css" />
+#+HTML_HEAD: <link rel="icon" type="image/png" href="../images/icon.png" />
 
-This is a *~J~* program which does some statistical analysis of
+This is a *~J~* program which does some statistical analysis on
 computer benchmark results. This is also a collection of notes so that
 I may recall what I learned while writing this script. 
 
 I mostly wanted a way to know which changes I was making to ~J~
-programs were actually effective ones. The built in time function ~x
-6!:2 y~ which averages the time taken to run ~y~ ~x~ times was
+programs were actually effective. The built in time function ~x 6!:2
+y~ which averages the time taken to run ~y~ ~x~ times is
 unsatisfactory for this purpose due to the performance characteristics
-of ~J~ programs which typically run slower on the first few trials and
-warm up a as they go. The consequence is for light programs ~y~ a
-large ~x~ is needed before the results converge. This averaging also
+of ~J~ programs, which typically run slower on the first few trials
+and warm up a as they go. A consequence is for light programs ~y~ a
+large ~x~ is needed before the results converge. The averaging also
 hides variability and range of the performance of ~y~.
 
-The main method used is bootstrapping, which enables the estimation of
-statistical parameters on nonparametric samples. I got the sense of
-what to look for from haskell's [[https://hackage.haskell.org/package/criterion][criterion]] package, and learned the
-material for how to implement it through Efron and Hastie's textbook
-[[https://web.stanford.edu/~hastie/CASI/][Computer Age Statistical Inference]]. See chapters 10 and 11 from there
-to get the original material.
+The method employed here is bootstrapping, which enables the
+estimation of statistical parameters on nonparametric samples. I got
+the sense of what to look for from haskell's [[https://hackage.haskell.org/package/criterion][criterion]] package, and
+learned the material for how to implement it through Efron and
+Hastie's textbook [[https://web.stanford.edu/~hastie/CASI/][Computer Age Statistical Inference]]. See chapters 10
+and 11 from there to get the original material.
 
 * Background
 
-We have a sample $x = (x_i)$ of benchmark results, which we (slightly
+We take a sample $x = (x_i)$ of benchmark results, which we (slightly
 dubiously) assume iid from some unknown distribution. From that we
 compute various statistics on that sample from corresponding
-algorithms $\hat\theta = s(x)$ in order to get an understanding of the
-results.
+algorithms $\hat\theta = s(x)$ in order to understand the results.
 
 Some of these benchmarks will be expensive to run and in general it
 won't be possible to gather a large sample. To that end, the process
 of statistical bootsrapping allows us to extrapolate better estimates
-on the statistics through resampling uniformly from $x$. Moreover,
-this process allows us to calculate standard errors on the statics as
-well as to attach confidence intervals to these computed
-statistics. And for our purposes, perhpas the most crucial aspect is
-that nothing need be assumed or known about the underlying distrubiton
-and that the computations are automatic.
+on the desired statistics through resampling uniformly from
+$x$. Moreover, this allows us to calculate standard errors and to
+attach confidence intervals on these computed statistics. And for our
+purposes, perhpas the most crucial aspect is that nothing need be
+assumed or known about the underlying distrubiton and that the
+computations are automatic.
 
-** Bootstrapping through resampling
+** Bootstrapping
 
-A bootstrap resample of the original sample $x$ is $x^* = (x_i^*)$
-where the $x_i*$ are drawn uniformly from $x$ and $n=|x|=|x^*|$. This
-resampling is carried out $B$ times, comprising the bootstrapped
-resample, allowing us to get a sample on the statistics
-$\hat\theta^{*b}$ themselves on which we can compute errors and
-confidence intervals. To start, letting
-$\hat\theta^{*\cdot}=\frac{\sum_b\hat\theta^{*b}}{B}$ be the man of
-the bootstrap resample, the bootstrap standard error can be calculated
+A single bootstrap resample of the original sample $x$ is $x^* =
+(x_i^*)$ where the $x_i*$ are drawn uniformly from $x$ and
+$n=|x|=|x^*|$. This resampling is carried out $B$ times, comprising
+the bootstrapped resample on which we compute statistics
+$\hat\theta^{*b}$. And from that, statistics such as 
 
 $$\hat {\text{se}} = \sqrt{\frac {\sum_b \big(\hat\theta^{*b} -
 \hat\theta^{*\cdot}\big)^2}{B-1}}$$
 
-Basically, the process is getting a sample $x$ from some unknown
-distribution $F$, and computing a statistic $\hat\theta$ from
-it. Estimating $\hat\theta$ by resampling $x^*$ from the emperical
-distribution $\hat F$ which assigns probability $\frac{1}{n}$ to each
-$x_i$ from $x$ and calculating $\hat\theta^*$. The key to this process
-is that $\hat F \rightarrow F$ as $n \rightarrow \infty$, and that for
-any $n$, $\hat F$ maximizes the probability of having observed $x$
-from $F$, whatever $F$ may actually be. In other words, $\hat F$ is
-the nonparametric maximum likelihood estimator for $F$. 
+can be computed. Basically, the process is getting a sample $x$ from
+some unknown distribution $F$, and computing a statistic $\hat\theta$
+on it. Then, better estimates of $\hat\theta$ come from resampling
+$x^*$ from the emperical distribution $\hat F$ which assigns
+probability $\frac{1}{n}$ to each $x_i$ from $x$ then calculating
+$\hat\theta^*$. The key to this process is that $\hat F \rightarrow F$
+as $n \rightarrow \infty$, and that for any $n$, $\hat F$ maximizes
+the probability of having observed $x$ from $F$, whatever $F$ may
+actually be. In other words, $\hat F$ is the nonparametric maximum
+likelihood estimator for $F$.
 
 The final step in the above process is akin to running another
 algorithm $\text{Sd}(\hat F) = \hat{\text{se}}$ on the bootstrap
 resample and is called the _ideal bootstrap estimate_ of the standard
 error. We can, however, do better inference and construct confidence
-intervals on the $\hat\theta^*$.
+intervals on the $\hat\theta^*$. 
+
+Before describing the bootstrap confidence calculations, a diversion
+on configuration.
 
 * Initial Sample and Configuration
 
@@ -198,14 +200,13 @@ The resamples may skew more heavily to one side or the other of $\hat
 \theta$. To correct for this, we look at the percentile of the it in
 the resample then derive the bounds on the confidence interval by
 mapping through the standard normal cdf $\Phi$ getting the desired
-coverage and then calculatin percentiles.
+coverage and then calculating percentiles.
 
 #+name: bias-percentile
 #+begin_src j :session :exports code
 NB. monad producing adverb where u is statistic and y is sample.
 bsbc=: 1 : 0
-  that=. u y
-  samp=. u dobootstrap bs_B y
+  that =. mean samp=. u dobootstrap bs_B y
   z0=. qnorm p0=. that quantile^:_1 samp
   I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
   ({.,(mean samp),{:) I quantile samp
@@ -241,3 +242,93 @@ bsbca=: 1 : 0
 #+end_src
 
 #+RESULTS: bias-and-accelerated
+
+* Regression
+
+J programs don't tend to have much overhead, but this is a nice idea
+from criterion. One way to estimate the performance of a program is to
+do a linear regression on the sample. Presumably the overhead will be
+captured in the constant term, giving a clearer picture of typical
+execution times. Here, we sum of the execution times to get ~n~
+snapshots of performance.
+
+#+name: regression
+#+begin_src j :session :exports both
+regress_bench=: +/\ %. 1 ,. i.@#
+rsquare_bench=: 3 : 0
+  v=. 1,.i.#y
+  d=. +/\ y
+  b=. d %. v
+  k=. <:{:$v
+  n=. $d
+  sst=. +/*:d-(+/d) % #d
+  sse=. +/*:d-v +/ .* b
+  mse=. sse%n->:k
+  seb=. %:({.mse)*(<0 1)|:%.(|:v) +/ .* v
+  ssr=. sst-sse
+  msr=. ssr%k
+  rsq=. ssr%sst
+  rsq
+)
+#+end_src
+
+* Description
+
+We default to the most sophisticated confidence measurement ~bsbca~
+and estimate some descriptive statistics in ~summarize~. This is a
+first draft I'd like to build out some functionality to compare
+benchmarks as well as output some kind of plots. Verb ~bonsai~ takes a
+J sentence, gets a sample, then runs the analysis. ~summarize~ is
+split out so that benchmark results gotten somehow else can also be
+subject to this analysis.
+
+#+name: analysis
+#+begin_src j :session :exports both
+NB. use bs bias corrected accelerated by default
+bs_est =: bsbca
+
+NB. report some descriptive statistics about a single vector y of
+NB. benchmark results.
+bs_summarize =: 3 : 0
+  samp=. y
+
+  xbarc=. mean bs_est samp
+  sdevc=. stddev bs_est samp
+  regac=. ({:@regress_bench) bs_est samp
+  rsqrc=. rsquare_bench bs_est samp
+  skwnc=. skewness bs_est samp
+  kurtc=. kurtosis bs_est samp
+  ests=. <"0 regac , rsqrc , xbarc , sdevc , skwnc ,: kurtc
+  ests=. (;: 'lower estimate upper') , ests
+
+  rows=. ('N = ',":#samp);'ols';('R',u:16b00b2);'mean';'stddev';'skewness';'kurtosis'
+  rows ,. ests
+)
+
+NB. run bencharks then report
+bonsai=: bs_summarize @ dobench
+#+end_src
+
+* Final Program
+
+#+begin_src j :session :tangle bonsai.ijs :noweb yes
+load 'plot stats/base stats/distribs'
+
+<<configuration>>
+
+<<sampling>>
+
+<<quantile>>
+
+<<standard-interval>>
+
+<<percentile>>
+
+<<bias-percentile>>
+
+<<bias-and-accelerated>>
+
+<<regression>>
+
+<<analysis>>
+#+end_src
