@@ -124,7 +124,8 @@ $$\bar x = \sum_i \frac{x_i}{n}$$
 $$\text{Var} (x) = \frac{\sum_i (x_i - \bar x)^2}{n-1}$$
 $$s = \sqrt \frac{\sum_i (x_i - \bar x)^2}{n-1}$$
 
-Percentils and quantiles on our samples can be computed as follows:
+Discrete percentiles and quantiles are not in J's stats addon and can
+be computed as follows:
 
 #+name: quantile
 #+begin_src j :session :exports code
@@ -216,7 +217,7 @@ bsbc=: 1 : 0
 #+RESULTS: bias-percentile
 
 The above corresponds to
-$$p_0=\frac{\#\{\hat\theta^{*b} \le \hat \theta\}}{B}$$
+$$p_0=\frac{\#\{\hat\theta^{*b} \le \hat \theta^*\}}{B}$$
 $$z_0=\Phi^{-1} (p_0)$$ $$\hat\theta_{\text{BC}}[\alpha] = \hat F^{-1}
 [\Phi (2\cdot z_0 + z^{(\alpha)})]$$
 

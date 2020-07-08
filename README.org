@@ -1,9 +1,7 @@
 
 Statistical benchmarking in J.
 
-See either the org file [[bonsai.org][bonsai]] or better yet head to
-[[http://j-raphael.net/posts/bonsai.html][j-raphael.net/posts/bonsai.html]] as git renders the markdown with
-mangled math formulas.
+See the [[http://j-raphael.net/posts/bonsai.html][documentation]] or browse the files here.
 
 #+begin_src j :session :exports both :sit 3
 load 'stats/bonsai'
