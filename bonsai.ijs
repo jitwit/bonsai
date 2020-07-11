@@ -44,8 +44,7 @@ bsbc=: 1 : 0
 
 NB. monad producing adverb where u is statistic and y is sample.
 bsbca=: 1 : 0
-  that=. u y
-  thati=. (- mean) 1 u \. y
+  thati=. (1 u \. y) - that=. u y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
   samp=. u dobootstrap bs_B y
   z0=. qnorm that quantile^:_1 samp
