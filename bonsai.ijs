@@ -23,12 +23,14 @@ meadian =: 0.5 & quantile
 NB. monad producing adverb where u is statistic and y is sample.
 bssi=: 1 : 0
   samp=. (u dobootstrap bs_B) y
-  (mean samp) -`+`:0 (stddev samp) * qnorm -. -: bs_a
+  (mean samp) -`[`+`:0 (stddev samp) * qnorm -. -: bs_a
 )
 
 NB. monad producing adverb where u is statistic and y is sample.
 bspi=: 1 : 0
-  ((,-.) -: bs_a) quantile (u dobootstrap bs_B) y
+  that=. u y
+  samp=. u dobootstrap bs_B y
+  ({.,that,{:) ((,-.) -: bs_a) quantile samp
 )
 
 NB. monad producing adverb where u is statistic and y is sample.
@@ -37,14 +39,15 @@ bsbc=: 1 : 0
   samp=. u dobootstrap bs_B y
   z0=. qnorm p0=. that quantile^:_1 samp
   I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
-  ({.,(mean samp),{:) I quantile samp
+  ({.,that,{:) I quantile samp
 )
 
 NB. monad producing adverb where u is statistic and y is sample.
 bsbca=: 1 : 0
+  that=. u y
   thati=. (- mean) 1 u \. y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
-  that=. mean samp=. u dobootstrap bs_B y
+  samp=. u dobootstrap bs_B y
   z0=. qnorm that quantile^:_1 samp
   zb=. qnorm -. -: bs_a
   zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
@@ -91,5 +94,5 @@ bs_summarize =: 3 : 0
   rows ,. ests
 )
 
-NB. run bencharks then report
+NB. default way to run bencharks then report
 bonsai=: bs_summarize @ dobench

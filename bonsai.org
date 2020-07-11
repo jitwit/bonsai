@@ -102,27 +102,7 @@ dobootstrap=: 2 : 'u"1 y {~ ? n # ,: $~ #y'
 
 #+RESULTS: dobench
 
-* Statistical Algorithms
-
-Many of these come from J's ~stats/base~ addon, but are included for
-fun and for completeness.
-
-#+name: basic-statistics-algorithms
-#+begin_src j :session :exports code
-mean   =: +/ % #         NB. is what it is
-dev    =: -"_1 _ mean    NB. deviation from mean (of possibly vector valued sample)
-ssdev  =: +/@:*:@:dev    NB. sum of squares of devation
-var    =: ssdev % <:@#   NB. unbiased variance
-stddev =: %:@var         NB. corrected sample standard deviation
-#+end_src
-
-#+RESULTS: basic-statistics-algorithms
-
-These correspond in normal math notation to
-
-$$\bar x = \sum_i \frac{x_i}{n}$$
-$$\text{Var} (x) = \frac{\sum_i (x_i - \bar x)^2}{n-1}$$
-$$s = \sqrt \frac{\sum_i (x_i - \bar x)^2}{n-1}$$
+* Percentiles
 
 Discrete percentiles and quantiles are not in J's stats addon and can
 be computed as follows:
@@ -165,7 +145,7 @@ normal distribution cdf.
 NB. monad producing adverb where u is statistic and y is sample.
 bssi=: 1 : 0
   samp=. (u dobootstrap bs_B) y
-  (mean samp) -`+`:0 (stddev samp) * qnorm -. -: bs_a
+  (mean samp) -`[`+`:0 (stddev samp) * qnorm -. -: bs_a
 )
 #+end_src
 
@@ -186,7 +166,9 @@ resamples to find our confidence.
 #+begin_src j :session :exports code
 NB. monad producing adverb where u is statistic and y is sample.
 bspi=: 1 : 0
-  ((,-.) -: bs_a) quantile (u dobootstrap bs_B) y
+  that=. u y
+  samp=. u dobootstrap bs_B y
+  ({.,that,{:) ((,-.) -: bs_a) quantile samp
 )
 #+end_src
 
@@ -211,7 +193,7 @@ bsbc=: 1 : 0
   samp=. u dobootstrap bs_B y
   z0=. qnorm p0=. that quantile^:_1 samp
   I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
-  ({.,(mean samp),{:) I quantile samp
+  ({.,that,{:) I quantile samp
 )
 #+end_src
 
@@ -231,9 +213,10 @@ $z_0=0$ and this agrees with the simple percentile interval.
 #+begin_src j :session :exports code
 NB. monad producing adverb where u is statistic and y is sample.
 bsbca=: 1 : 0
+  that=. u y
   thati=. (- mean) 1 u \. y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
-  that=. mean samp=. u dobootstrap bs_B y
+  samp=. u dobootstrap bs_B y
   z0=. qnorm that quantile^:_1 samp
   zb=. qnorm -. -: bs_a
   zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
@@ -307,7 +290,7 @@ bs_summarize =: 3 : 0
   rows ,. ests
 )
 
-NB. run bencharks then report
+NB. default way to run bencharks then report
 bonsai=: bs_summarize @ dobench
 #+end_src
 
