@@ -44,9 +44,11 @@ bsbc=: 1 : 0
 
 NB. monad producing adverb where u is statistic and y is sample.
 bsbca=: 1 : 0
-  thati=. (1 u \. y) - that=. u y
+  thati=. (1 u \. y) - u y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
-  samp=. u dobootstrap bs_B y
+  NB. I think that should actually be u y, but for some statistics (eg
+  NB. R^2), it is out of range of bootstrap resamples, giving z0 = __
+  that=. mean samp=. u dobootstrap bs_B y
   z0=. qnorm that quantile^:_1 samp
   zb=. qnorm -. -: bs_a
   zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
