@@ -209,6 +209,14 @@ $z_0=0$ and this agrees with the simple percentile interval.
 
 ** Bias-corrected and Accelerated Percentile Interval
 
+The previous method assumes the existence of a monotone transform
+$\hat \phi = m (\hat \theta)$ such that $\hat \phi \sim N(\hat\phi -
+z_0 \sigma, \sigma^2)$. The standard error is assumed
+constant. Relaxing the assumption to let it vary with $\phi$ is the
+key to the accelerated method. We assume the error is described by
+some acceleration $a$ in $$ \hat \phi \sim N(\phi - z_0 \sigma_\phi,
+\sigma_\phi^2) \text { , with  } \sigma_\phi = 1 + a\phi$$
+
 #+name: bias-and-accelerated
 #+begin_src j :session :exports code
 NB. monad producing adverb where u is statistic and y is sample.
@@ -227,6 +235,15 @@ bsbca=: 1 : 0
 #+end_src
 
 #+RESULTS: bias-and-accelerated
+
+The above corresponds to calculating
+
+$$ \hat\theta_\text{BCa}[\alpha] = \hat F^{-1} \bigg [ \Phi \bigg (
+ z_0 + \frac {z_0 + z^{(\alpha)}}{1 - a (z_0 + z^{(\alpha)})} \bigg
+ ) \bigg ] $$
+
+where the $a$ term is found by jack-knifing the statistic $\theta$ on
+the original sample in unbiasing by its skewness.
 
 * Regression
 
