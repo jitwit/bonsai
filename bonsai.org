@@ -292,7 +292,7 @@ In J:
 #+name: bootstrap-t
 #+begin_src j :session :exports both
 se2_t=: +&%&# * +&ssdev % +&#-2:
-se_t=: %:@:se2
+se_t=: %:@:se2_t
 
 bs_t=: 4 : 0
   nxy2=. x (+&#-2:) y
@@ -318,11 +318,11 @@ original sample, then bootstrapping the pivotal quantity $t*$.
 
 We default to the most sophisticated confidence measurement ~bsbca~
 and estimate some descriptive statistics in ~summarize~. This is a
-first draft I'd like to build out some functionality to compare
-benchmarks as well as output some kind of plots. Verb ~bonsai~ takes a
-J sentence, gets a sample, then runs the analysis. ~summarize~ is
-split out so that benchmark results gotten somehow else can also be
-subject to this analysis.
+early draft and I'd like to build out some functionality for plotting
+results. Verb ~bonsai~ is ambivalent, and when used as a dyad
+benchmarks two sentences and compares their mean execution times via
+bootstrap-t and reports some descriptive statistics for each. When
+used as a monad, it just outputs the descriptive statistics.
 
 #+name: analysis
 #+begin_src j :session :exports both
@@ -347,9 +347,19 @@ bs_summarize =: 3 : 0
   rows ,. ests
 )
 
-NB. default way to run bencharks then report
-bonsai=: bs_summarize @ dobench
+NB. ambivalent benchmarks
+bonsai=: 3 : 0
+  0 bonsai y
+  : 
+  if. x do. 'sx sy'=. x ;&dobench y
+	    echo (;: 'comparison lower estimate upper') ,: 'x - & mean y' ; <"0 sx bs_t sy
+      	    echo bs_summarize sx
+	    echo bs_summarize sy
+  else. bs_summarize dobench y end.
+)
 #+end_src
+
+#+RESULTS: analysis
 
 
 
@@ -357,14 +367,24 @@ bonsai=: bs_summarize @ dobench
 
 #+begin_src j :session :tangle bonsai.ijs :noweb yes
 load 'plot stats/base stats/distribs'
+
 <<configuration>>
+
 <<sampling>>
+
 <<quantile>>
+
 <<standard-interval>>
+
 <<percentile>>
+
 <<bias-percentile>>
+
 <<bias-and-accelerated>>
+
 <<regression>>
+
 <<bootstrap-t>>
+
 <<analysis>>
 #+end_src

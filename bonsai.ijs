@@ -1,13 +1,16 @@
 load 'plot stats/base stats/distribs'
+
 bs_1rn  =: 1      NB. time alloted (upper bound on)
 bs_n_lo =: 5      NB. minimum sample
 bs_n_hi =: 1000   NB. maximum sample
 bs_a    =: 0.1    NB. coverage
 bs_B    =: 2000   NB. bootstrap resample
+
 NB. monad taking prgram y to run a number of times based on configuration
 dobench=: 6!:2"1@(# ,:)~ (bs_n_lo >. bs_n_hi <. [: <. bs_1rn % 6!:2)
 NB. u is parameter, n is bootstrap B, y is sample
 dobootstrap=: 2 : 'u"1 y {~ ? n # ,: $~ #y'
+
 discrete_cdf=: 4 : 0
 ws=. (%+/)"1 -. | xs -"0 1 is=. (<.,>.)"0 xs=. x * <:#y
 ws (+/"1 @: *) is { /:~ y
@@ -16,17 +19,20 @@ ws (+/"1 @: *) is { /:~ y
 quantile =: discrete_cdf :. (+/ @: (<:/~) % #@])
 
 meadian =: 0.5 & quantile
+
 NB. monad producing adverb where u is statistic and y is sample.
 bssi=: 1 : 0
   samp=. (u dobootstrap bs_B) y
   (mean samp) -`[`+`:0 (stddev samp) * qnorm -. -: bs_a
 )
+
 NB. monad producing adverb where u is statistic and y is sample.
 bspi=: 1 : 0
   that=. u y
   samp=. u dobootstrap bs_B y
   ({.,that,{:) ((,-.) -: bs_a) quantile samp
 )
+
 NB. monad producing adverb where u is statistic and y is sample.
 bsbc=: 1 : 0
   that =. u y
@@ -35,6 +41,7 @@ bsbc=: 1 : 0
   I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
   ({.,that,{:) I quantile samp
 )
+
 NB. monad producing adverb where u is statistic and y is sample.
 bsbca=: 1 : 0
   thati=. (1 u \. y) - u y
@@ -49,6 +56,7 @@ bsbca=: 1 : 0
   zah=. z0 + (z0+za) % 1 - ahat * z0+za
   ({.,that,{:) (pnorm zah,zbh) quantile samp
 )
+
 regress_bench=: +/\ %. 1 ,. i.@#
 rsquare_bench=: 3 : 0
   v=. 1,.i.#y
@@ -65,8 +73,9 @@ rsquare_bench=: 3 : 0
   rsq=. ssr%sst
   rsq
 )
+
 se2_t=: +&%&# * +&ssdev % +&#-2:
-se_t=: %:@:se2
+se_t=: %:@:se2_t
 
 bs_t=: 4 : 0
   nxy2=. x (+&#-2:) y
@@ -80,6 +89,7 @@ bs_t=: 4 : 0
 )
 
 bs_compare=: bs_t & dobench
+
 NB. use bs bias corrected accelerated by default
 bs_est =: bsbca
 
@@ -101,5 +111,13 @@ bs_summarize =: 3 : 0
   rows ,. ests
 )
 
-NB. default way to run bencharks then report
-bonsai=: bs_summarize @ dobench
+NB. ambivalent benchmarks
+bonsai=: 3 : 0
+  0 bonsai y
+  : 
+  if. x do. 'sx sy'=. x ;&dobench y
+	    echo (;: 'comparison lower estimate upper') ,: 'x - & mean y' ; <"0 sx bs_t sy
+      	    echo bs_summarize sx
+	    echo bs_summarize sy
+  else. bs_summarize dobench y end.
+)
