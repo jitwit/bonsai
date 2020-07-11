@@ -78,13 +78,9 @@ se2_t=: +&%&# * +&ssdev % +&#-2:
 se_t=: %:@:se2_t
 
 bs_t=: 4 : 0
-  nxy2=. x (+&#-2:) y
-  rnpx =. x +&%&# y
-  samp_x =. ] dobootstrap bs_B x
-  samp_y =. ] dobootstrap bs_B y
   that=. x -&mean y
   sehat=. x se_t y
-  samp=. samp_x ((that -~ (-&mean)) % se_t)"1 samp_y
+  samp=. x ((that -~ -&mean) % se_t)"1 & (] dobootstrap bs_B) y
   ({.,that,{:) that - sehat * ((,~-.) -: bs_a) quantile samp
 )
 
@@ -115,6 +111,8 @@ NB. ambivalent benchmarks
 bonsai=: 3 : 0
   0 bonsai y
   : 
+  NB. the program that goes second suffers performance... figure out
+  NB. something better!
   if. x do. 'sx sy'=. x ;&dobench y
 	    echo (;: 'comparison lower estimate upper') ,: '- & mean' ; <"0 sx bs_t sy
       	    echo bs_summarize sx
