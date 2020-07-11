@@ -352,7 +352,7 @@ bonsai=: 3 : 0
   0 bonsai y
   : 
   if. x do. 'sx sy'=. x ;&dobench y
-	    echo (;: 'comparison lower estimate upper') ,: 'x - & mean y' ; <"0 sx bs_t sy
+	    echo (;: 'comparison lower estimate upper') ,: '- & mean' ; <"0 sx bs_t sy
       	    echo bs_summarize sx
 	    echo bs_summarize sy
   else. bs_summarize dobench y end.
