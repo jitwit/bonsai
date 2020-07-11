@@ -246,17 +246,19 @@ $$ \hat\theta_\text{BCa}[\alpha] = \hat F^{-1} \bigg [ \Phi \bigg (
 where the $a$ term is found by jack-knifing the statistic $\theta$ on
 the original sample in unbiasing by its skewness.
 
-* Regression
+* Description
 
-J programs don't tend to have much overhead, but this is a nice idea
-from criterion. One way to estimate the performance of a program is to
-do a linear regression on the sample. Presumably the overhead will be
-captured in the constant term, giving a clearer picture of typical
-execution times. Here, we sum of the execution times to get ~n~
-snapshots of performance.
+** Regression
 
-#+name: regression
-#+begin_src j :session :exports both
+ J programs don't tend to have much overhead, but this is a nice idea
+ from criterion. One way to estimate the performance of a program is to
+ do a linear regression on the sample. Presumably the overhead will be
+ captured in the constant term, giving a clearer picture of typical
+ execution times. Here, we sum of the execution times to get ~n~
+ snapshots of performance.
+
+ #+name: regression
+ #+begin_src j :session :exports both
 regress_bench=: +/\ %. 1 ,. i.@#
 rsquare_bench=: 3 : 0
   v=. 1,.i.#y
@@ -273,9 +275,46 @@ rsquare_bench=: 3 : 0
   rsq=. ssr%sst
   rsq
 )
+ #+end_src
+
+** Bootstrap-t
+
+Find confidence for $\theta = \mu_x - \mu_y$ given two samples of size
+$n_x$ and $n_y$. Estimate $\hat \theta = \bar x - \bar y$. Depends on
+nuissance parameter $\sigma^2$. Traditional student-t instead bases
+$\hat \theta$ on _pivotal quantity_ $t = \frac{\hat\theta -
+\theta}{\hat {se}}$. $\hat{se}$ is unbiased estimater for nuissance
+parameter $$\hat{se}^2 = (\frac{1}{n_x}+\frac{1}{n_y})\cdot \frac{\sum
+(x-\bar x)^2 - \sum (y-\bar y)^2}{n_x+n_y - 2}$$
+
+In J:
+
+#+name: bootstrap-t
+#+begin_src j :session :exports both
+se2_t=: +&%&# * +&ssdev % +&#-2:
+se_t=: %:@:se2
+
+bs_t=: 4 : 0
+  nxy2=. x (+&#-2:) y
+  rnpx =. x +&%&# y
+  samp_x =. ] dobootstrap bs_B x
+  samp_y =. ] dobootstrap bs_B y
+  that=. x -&mean y
+  sehat=. x se_t y
+  samp=. samp_x ((that -~ (-&mean)) % se_t)"1 samp_y
+  ({.,that,{:) that - sehat * ((,~-.) -: bs_a) quantile samp
+)
+
+bs_compare=: bs_t & dobench
 #+end_src
 
-* Description
+#+RESULTS: bootstrap-t
+
+The idea is we can get some confidence on the parameter $\hat \theta =
+\bar x - \bar y$ of the two samples by taking $\mu_x,\mu_y$ from the
+original sample, then bootstrapping the pivotal quantity $t*$.
+
+** Analysis
 
 We default to the most sophisticated confidence measurement ~bsbca~
 and estimate some descriptive statistics in ~summarize~. This is a
@@ -312,26 +351,20 @@ NB. default way to run bencharks then report
 bonsai=: bs_summarize @ dobench
 #+end_src
 
+
+
 * Final Program
 
 #+begin_src j :session :tangle bonsai.ijs :noweb yes
 load 'plot stats/base stats/distribs'
-
 <<configuration>>
-
 <<sampling>>
-
 <<quantile>>
-
 <<standard-interval>>
-
 <<percentile>>
-
 <<bias-percentile>>
-
 <<bias-and-accelerated>>
-
 <<regression>>
-
+<<bootstrap-t>>
 <<analysis>>
 #+end_src
