@@ -284,10 +284,20 @@ $n_x$ and $n_y$. Estimate $\hat \theta = \bar x - \bar y$. Depends on
 nuissance parameter $\sigma^2$. Traditional student-t instead bases
 $\hat \theta$ on _pivotal quantity_ $t = \frac{\hat\theta -
 \theta}{\hat {se}}$. $\hat{se}$ is unbiased estimater for nuissance
-parameter $$\hat{se}^2 = (\frac{1}{n_x}+\frac{1}{n_y})\cdot \frac{\sum
-(x-\bar x)^2 - \sum (y-\bar y)^2}{n_x+n_y - 2}$$
+parameter $$\hat{se}^2 = \bigg(\frac{1}{n_x}+\frac{1}{n_y}\bigg)\cdot
+\frac{\sum (x-\bar x)^2 - \sum (y-\bar y)^2}{n_x+n_y - 2}$$
 
-In J:
+Bootstrap-t instead estimates distribution of $t$ through
+bootstrapping. Nonparametric resamples are drawn from $x$ and $y$,
+$\hat \theta$ plays the role of our assumption $\mu_x - \mu_y$, and we
+examine $t^* = \frac{\hat\theta^* - \hat\theta}{\hat {se}^*}$. The
+quantiles from the replications $t^{*b}$ provide the confidence
+intervals
+
+$$\hat\theta^*[\alpha] = \hat \theta - \hat{se} \cdot t^{*(1-\alpha)}$$ 
+
+In
+J:
 
 #+name: bootstrap-t
 #+begin_src j :session :exports both
