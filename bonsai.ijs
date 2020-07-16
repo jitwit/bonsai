@@ -50,11 +50,8 @@ bsbca=: 1 : 0
   NB. R^2), it is out of range of bootstrap resamples, giving z0 = __
   that=. mean samp=. u dobootstrap bs_B y
   z0=. qnorm that quantile^:_1 samp
-  zb=. qnorm -. -: bs_a
-  zbh=. z0 + (z0+zb) % 1 - ahat * z0+zb
-  za=. qnorm -: bs_a
-  zah=. z0 + (z0+za) % 1 - ahat * z0+za
-  ({.,that,{:) (pnorm zah,zbh) quantile samp
+  zabh=. z0 + (% 1 - ahat&*) z0 + qnorm (,-.) -: bs_a
+  ({.,that,{:) (pnorm zabh) quantile samp
 )
 
 regress_bench=: +/\ %. 1 ,. i.@#
