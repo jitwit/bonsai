@@ -9,8 +9,7 @@ bs_B    =: 2000   NB. bootstrap resample
 NB. monad taking prgram y to run a number of times based on configuration.
 NB. x runbench y measures time to execute y x times. 
 dobench=:  3 : 0
-  r0=. 6!:2 y
-  (bs_n_hi <. bs_n_lo >. >. bs_tl % r0) dobench y
+  (bs_n_hi <. bs_n_lo >. >. bs_tl % 1e_6 >. 6!:2 y) dobench y
   :
   6!:2"1 x # ,: y
 )
