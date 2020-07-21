@@ -1,19 +1,26 @@
 load 'plot stats/base stats/distribs'
 
-bs_1rn  =: 1      NB. time alloted (upper bound on)
+bs_tl   =: 1      NB. time alloted (upper bound on)
 bs_n_lo =: 5      NB. minimum sample
 bs_n_hi =: 1000   NB. maximum sample
 bs_a    =: 0.1    NB. coverage
 bs_B    =: 2000   NB. bootstrap resample
 
-NB. monad taking prgram y to run a number of times based on configuration
-dobench=: 6!:2"1@(# ,:)~ (bs_n_lo >. bs_n_hi <. [: <. bs_1rn % 6!:2)
+NB. monad taking prgram y to run a number of times based on configuration.
+NB. x runbench y measures time to execute y x times. 
+dobench=:  3 : 0
+  r0=. 6!:2 y
+  (bs_n_hi <. bs_n_lo >. bs_tl % r0) runbench y
+  :
+  6!:2"1 x # ,: y
+)
+
 NB. u is parameter, n is bootstrap B, y is sample
 dobootstrap=: 2 : 'u"1 y {~ ? n # ,: $~ #y'
 
 discrete_cdf=: 4 : 0
-ws=. (%+/)"1 -. | xs -"0 1 is=. (<.,>.)"0 xs=. x * <:#y
-ws (+/"1 @: *) is { /:~ y
+  ws=. (%+/)"1 -. | xs -"0 1 is=. (<.,>.)"0 xs=. x * <:#y
+  ws (+/"1 @: *) is { /:~ y
 )
 
 quantile =: discrete_cdf :. (+/ @: (<:/~) % #@])
