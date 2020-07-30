@@ -14,8 +14,8 @@ dobench=:  3 : 0
   6!:2"1 x # ,: y
 )
 
-NB. u is parameter, n is bootstrap B, y is sample
-dobootstrap=: 2 : 'u"1 y {~ ? n # ,: $~ #y'
+NB. resample: u is bootstrap iters B, y is original sample
+dobootstrap=: 1 : 'y {~ ? u # ,: $~ #y'
 
 discrete_cdf=: 4 : 0
   ws=. (%+/)"1 -. | xs -"0 1 is=. (<.,>.)"0 xs=. x * <:#y
@@ -26,38 +26,39 @@ quantile =: discrete_cdf :. (+/ @: (<:/~) % #@])
 
 meadian =: 0.5 & quantile
 
-NB. monad producing adverb where u is statistic and y is sample.
+NB. dyad producing adverb where u is statistic, x is resample, y is sample
 bssi=: 1 : 0
-  samp=. (u dobootstrap bs_B) y
-  (mean samp) -`[`+`:0 (stddev samp) * qnorm -. -: bs_a
+  resamp=. u"1 x
+  (mean resamp) -`[`+`:0 (stddev resamp) * qnorm -. -: bs_a
 )
 
-NB. monad producing adverb where u is statistic and y is sample.
+NB. monad producing adverb where u is statistic, y is sample, and x is resample.
 bspi=: 1 : 0
   that=. u y
-  samp=. u dobootstrap bs_B y
-  ({.,that,{:) ((,-.) -: bs_a) quantile samp
+  resamp=. u"1 x
+  ({.,that,{:) ((,-.) -: bs_a) quantile resamp
 )
 
 NB. monad producing adverb where u is statistic and y is sample.
 bsbc=: 1 : 0
   that =. u y
-  samp=. u dobootstrap bs_B y
+  resamp=. u"1 x
   z0=. qnorm p0=. that quantile^:_1 samp
   I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
   ({.,that,{:) I quantile samp
 )
 
-NB. monad producing adverb where u is statistic and y is sample.
+NB. dyad producing adverb where u is statistic and y is sample and x is resample
 bsbca=: 1 : 0
-  thati=. (1 u \. y) - u y
+  thati=. (1 u \. y) - that =. u y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
-  NB. I think that should actually be u y, but for some statistics (eg
-  NB. R^2), it is out of range of bootstrap resamples, giving z0 = __
-  that=. mean samp=. u dobootstrap bs_B y
-  z0=. qnorm that quantile^:_1 samp
-  zabh=. z0 + (% 1 - ahat&*) z0 + qnorm (,-.) -: bs_a
-  ({.,that,{:) (pnorm zabh) quantile samp
+  resamp=. u"1 x NB. u dobootstrap bs_B y
+  z0qt=. that quantile^:_1 resamp
+  if. z0qt e. 0 1 do. x u bspi y 
+  else. z0=. qnorm z0qt
+        zabh=. z0 + (% 1 - ahat&*) z0 + qnorm (,-.) -: bs_a
+        ({.,that,{:) (pnorm zabh) quantile resamp
+  end.
 )
 
 regress_bench=: +/\ %. 1 ,. i.@#
@@ -83,11 +84,22 @@ se_t=: %:@:se2_t
 bs_t=: 4 : 0
   that=. x -&mean y
   sehat=. x se_t y
-  samp=. x ((that -~ -&mean) % se_t)"1 & (] dobootstrap bs_B) y
+  samp=. x ((that -~ -&mean) % se_t)"1 & (bs_B dobootstrap) y
   ({.,that,{:) that - sehat * ((,~-.) -: bs_a) quantile samp
 )
 
 bs_compare=: bs_t & dobench
+
+bonsai_plotted =: 3 : 0
+resamp=. bs_B dobootstrap samp=. dobench y
+pd 'reset;xcaption runs; ycaption time; title bonsai'
+pd 'subtitle program: ''',y,'''; subtitlecolor snow'
+pd 'backcolor black; labelcolor snow; captioncolor snow; titlecolor snow'
+pd 'axiscolor snow; labelcolor snow; captioncolor snow'
+pd 'color 157 174 255;type dot; pensize 0.6'
+pd samp
+pd 'show'
+)
 
 NB. use bs bias corrected accelerated by default
 bs_est =: bsbca
@@ -96,13 +108,13 @@ NB. report some descriptive statistics about a single vector y of
 NB. benchmark results.
 bs_summarize =: 3 : 0
   samp=. y
-
-  xbarc=. mean bs_est samp
-  sdevc=. stddev bs_est samp
-  regac=. ({:@regress_bench) bs_est samp
-  rsqrc=. rsquare_bench bs_est samp
-  skwnc=. skewness bs_est samp
-  kurtc=. kurtosis bs_est samp
+  resamp=. bs_B dobootstrap y
+  xbarc=. resamp mean bs_est samp
+  sdevc=. resamp stddev bs_est samp
+  regac=. resamp ({:@regress_bench) bs_est samp
+  rsqrc=. resamp rsquare_bench bs_est samp
+  skwnc=. resamp skewness bs_est samp
+  kurtc=. resamp kurtosis bs_est samp
   ests=. <"0 regac , rsqrc , xbarc , sdevc , skwnc ,: kurtc
   ests=. (;: 'lower estimate upper') , ests
 
