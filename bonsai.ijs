@@ -3,7 +3,7 @@ load 'plot stats/base stats/distribs'
 bs_tl   =: 1      NB. time alloted (upper bound on)
 bs_n_lo =: 5      NB. minimum sample
 bs_n_hi =: 1000   NB. maximum sample
-bs_a    =: 0.1    NB. coverage
+bs_a    =: 0.05   NB. coverage
 bs_B    =: 2000   NB. bootstrap resample
 
 NB. monad taking prgram y to run a number of times based on configuration.
@@ -92,12 +92,18 @@ bs_compare=: bs_t & dobench
 
 bonsai_plotted =: 3 : 0
 resamp=. bs_B dobootstrap samp=. dobench y
+N =. # samp
+'rlo rmi rhi'=. resamp ({:@regress_bench) bs_est samp
 pd 'reset;xcaption runs; ycaption time; title bonsai'
-pd 'subtitle program: ''',y,'''; subtitlecolor snow'
+pd 'subtitle ''',y,'''; subtitlecolor snow'
 pd 'backcolor black; labelcolor snow; captioncolor snow; titlecolor snow'
 pd 'axiscolor snow; labelcolor snow; captioncolor snow'
-pd 'color 157 174 255;type dot; pensize 0.6'
-pd samp
+pd 'color 78 233 215;type dot; pensize 0.6'
+pd samp ;~ 1 + i. N
+pd 'color 195 173 240;type line; pensize 1.4'
+pd (,~rlo) ;~ 1,N
+pd (,~rmi) ;~ 1,N
+pd (,~rhi) ;~ 1,N
 pd 'show'
 )
 
