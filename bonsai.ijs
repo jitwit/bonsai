@@ -90,22 +90,22 @@ bs_t=: 4 : 0
 
 bs_compare=: bs_t & dobench
 
-bonsai_plotted =: 3 : 0
-resamp=. bs_B dobootstrap samp=. dobench y
-N =. # samp
-'rlo rmi rhi'=. resamp ({:@regress_bench) bs_est samp
-pd 'reset;xcaption runs; ycaption time; title bonsai'
-pd 'subtitle ''',y,'''; subtitlecolor snow'
-pd 'backcolor black; labelcolor snow; captioncolor snow; titlecolor snow'
-pd 'axiscolor snow; labelcolor snow; captioncolor snow'
-pd 'color 78 233 215;type dot; pensize 0.6'
-pd samp ;~ 1 + i. N
-pd 'color 195 173 240;type line; pensize 1.4'
-pd (,~rlo) ;~ 1,N
-pd (,~rmi) ;~ 1,N
-pd (,~rhi) ;~ 1,N
-pd 'show'
-)
+NB. bonsai_plotted =: 3 : 0
+NB. resamp=. bs_B dobootstrap samp=. dobench y
+NB. N =. # samp
+NB. 'rlo rmi rhi'=. resamp ({:@regress_bench) bs_est samp
+NB. pd 'reset;xcaption runs; ycaption time; title bonsai'
+NB. pd 'subtitle ''',y,'''; subtitlecolor snow'
+NB. pd 'backcolor black; labelcolor snow; captioncolor snow; titlecolor snow'
+NB. pd 'axiscolor snow; labelcolor snow; captioncolor snow'
+NB. pd 'color 78 233 215;type dot; pensize 0.6'
+NB. pd samp ;~ 1 + i. N
+NB. pd 'color 195 173 240;type line; pensize 1.4'
+NB. pd (,~rlo) ;~ 1,N
+NB. pd (,~rmi) ;~ 1,N
+NB. pd (,~rhi) ;~ 1,N
+NB. pd 'show'
+NB. )
 
 NB. use bs bias corrected accelerated by default
 bs_est =: bsbca

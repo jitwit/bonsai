@@ -422,7 +422,7 @@ load 'plot stats/base stats/distribs'
 
 <<bootstrap-t>>
 
-<<plotting>>
+NB. <<plotting>>
 
 <<analysis>>
 #+end_src
