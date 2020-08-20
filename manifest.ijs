@@ -8,7 +8,7 @@ inspired by https://hackage.haskell.org/package/criterion
 informed by https://projecteuclid.org/download/pdf_1/euclid.ss/1177013815 and https://web.stanford.edu/~hastie/CASI/
 )
 
-VERSION=: '1.0.2'
+VERSION=: '1.0.3'
 
 RELEASE=: 'j902'
 
