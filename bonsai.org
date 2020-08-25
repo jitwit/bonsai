@@ -6,18 +6,16 @@
 
 This is a *~J~* program which does some statistical analysis on
 computer benchmark results. This is also a collection of notes so that
-I may recall what I learned while writing this script. 
+I may recall what I learned while writing this script.
 
-I mostly wanted a way to know which changes I was making to ~J~
-programs were actually effective. The built in time function ~x 6!:2
-y~ which averages the time taken to run ~y~ ~x~ times is
-unsatisfactory for this purpose due to the performance characteristics
-of ~J~ programs, which typically run slower on the first few trials
-and warm up a as they go. A consequence is for light programs ~y~ a
-large ~x~ is needed before the results converge. The averaging also
-hides variability and range of the performance of ~y~.
+I wanted a way to know which changes I was making to ~J~ programs were
+actually effective. The built in time function ~x 6!:2 y~, which
+averages the time taken to run ~y~ ~x~ times, isn't great for this
+purpose as averaging destroys information and it takes a hit from
+initial interprative overhead. Light programs ~y~ thus require a large
+~x~, before the results converge.
 
-The method employed here is bootstrapping, which enables the
+*~bonsai~* uses is statistical bootstrapping, which enables the
 estimation of statistical parameters on nonparametric samples. I got
 the sense of what to look for from haskell's [[https://hackage.haskell.org/package/criterion][criterion]] package, and
 learned the material for how to implement it through Efron and
@@ -199,7 +197,7 @@ bsbc=: 1 : 0
   that =. u y
   resamp=. u"1 x
   z0=. qnorm p0=. that quantile^:_1 samp
-  I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
+  I=. pnorm (+: z0) + qnorm (,-.) -: bs_a
   ({.,that,{:) I quantile samp
 )
 #+end_src
@@ -232,7 +230,7 @@ bsbca=: 1 : 0
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
   resamp=. u"1 x NB. u dobootstrap bs_B y
   z0qt=. that quantile^:_1 resamp
-  if. (z0qt <: 0) +. z0qt >: 1 do. x u bspi y
+  if. -. (0 < z0qt) *. z0qt < 1 do. x u bspi y
   else. z0=. qnorm z0qt
         zabh=. z0 + (% 1 - ahat&*) z0 + qnorm (,-.) -: bs_a
         ({.,that,{:) (pnorm zabh) quantile resamp

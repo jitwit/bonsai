@@ -44,7 +44,7 @@ bsbc=: 1 : 0
   that =. u y
   resamp=. u"1 x
   z0=. qnorm p0=. that quantile^:_1 samp
-  I=. pnorm (+: z0) + (qnorm (,-.) -: bs_a)
+  I=. pnorm (+: z0) + qnorm (,-.) -: bs_a
   ({.,that,{:) I quantile samp
 )
 
@@ -54,7 +54,7 @@ bsbca=: 1 : 0
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
   resamp=. u"1 x NB. u dobootstrap bs_B y
   z0qt=. that quantile^:_1 resamp
-  if. (z0qt <: 0) +. z0qt >: 1 do. x u bspi y
+  if. -. (0 < z0qt) *. z0qt < 1 do. x u bspi y
   else. z0=. qnorm z0qt
         zabh=. z0 + (% 1 - ahat&*) z0 + qnorm (,-.) -: bs_a
         ({.,that,{:) (pnorm zabh) quantile resamp
