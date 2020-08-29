@@ -127,10 +127,11 @@ meadian =: 0.5&(cdf^:_1)
 #+RESULTS: quantile
 
 The local variables ~is~ and ~ws~ are used to interpolate between
-values at neighboring indices so that for example ~0.5 discrete_cdf 0
-3~ and ~median 0 3~ agree and are both ~1.5~. Declaring quantile as a
-function with obverse is cute but technically not valid. The delcared
-obverse counts how many elements of ~y~ are less than or equal to ~x~.
+values at neighboring indices so that for example ~0.5 (cdf^:_1) 0 3~
+and ~median 0 3~ agree and are both ~1.5~. Declaring this as a
+function with obverse is cute but technically these verbs are not
+valid obverses. Anyway, the delcared obverse counts how many elements
+of ~y~ are less than or equal to ~x~.
 
 * Bootstrapping Confidence
 
@@ -194,7 +195,7 @@ NB. monad producing adverb where u is statistic and y is sample.
 bsbc=: 1 : 0
   z0=. qnorm p0=. (that =. u y) cdf resamp=. u"1 x
   I=. pnorm (+: z0) + qnorm (,-.) -: bs_a
-  ({.,that,{:) I quantile samp
+  ({.,that,{:) I (cdf^:_1) samp
 )
 #+end_src
 
