@@ -17,33 +17,29 @@ dobench=:  3 : 0
 NB. resample: u is bootstrap iters B, y is original sample
 dobootstrap=: 1 : 'y {~ ? u # ,: $~ #y'
 
-discrete_cdf=: 4 : 0
+qtile =: 4 : 0
   ws=. (%+/)"1 -. | xs -"0 1 is=. (<.,>.)"0 xs=. x * <:#y
   ws (+/"1 @: *) is { /:~ y
 )
 
-quantile =: discrete_cdf :. (+/ @: (<:/~) % #@])
+cdf =: (+/ @: (<:/~) % #@]) :. qtile
 
-meadian =: 0.5 & quantile
+meadian =: 0.5&(cdf^:_1)
 
 NB. dyad producing adverb where u is statistic, x is resample, y is sample
 bssi=: 1 : 0
-  resamp=. u"1 x
-  (mean resamp) -`[`+`:0 (stddev resamp) * qnorm -. -: bs_a
+  s=. u"1 x
+  (mean s) -`[`+`:0 (stddev s) * qnorm -. -: bs_a
 )
 
 NB. monad producing adverb where u is statistic, y is sample, and x is resample.
 bspi=: 1 : 0
-  that=. u y
-  resamp=. u"1 x
-  ({.,that,{:) ((,-.) -: bs_a) quantile resamp
+  ((-:i.3) + (i:_1) * -:bs_a) cdf^:_1 u"1 x
 )
 
 NB. monad producing adverb where u is statistic and y is sample.
 bsbc=: 1 : 0
-  that =. u y
-  resamp=. u"1 x
-  z0=. qnorm p0=. that quantile^:_1 samp
+  z0=. qnorm p0=. (that =. u y) cdf resamp=. u"1 x
   I=. pnorm (+: z0) + qnorm (,-.) -: bs_a
   ({.,that,{:) I quantile samp
 )
@@ -52,12 +48,11 @@ NB. dyad producing adverb where u is statistic and y is sample and x is resample
 bsbca=: 1 : 0
   thati=. (1 u \. y) - that =. u y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
-  resamp=. u"1 x NB. u dobootstrap bs_B y
-  z0qt=. that quantile^:_1 resamp
+  z0qt=. that cdf resamp=. u"1 x NB. u dobootstrap bs_B y
   if. -. (0 < z0qt) *. z0qt < 1 do. x u bspi y
   else. z0=. qnorm z0qt
         zabh=. z0 + (% 1 - ahat&*) z0 + qnorm (,-.) -: bs_a
-        ({.,that,{:) (pnorm zabh) quantile resamp
+        ({.,that,{:) (pnorm zabh) cdf^:_1 resamp
   end.
 )
 
@@ -85,7 +80,7 @@ bs_t=: 4 : 0
   that=. x -&mean y
   sehat=. x se_t y
   samp=. x ((that -~ -&mean) % se_t)"1 & (bs_B dobootstrap) y
-  ({.,that,{:) that - sehat * ((,~-.) -: bs_a) quantile samp
+  ({.,that,{:) that - sehat * ((,~-.) -: bs_a) cdf^:_1 samp
 )
 
 bs_compare=: bs_t & dobench
