@@ -28,8 +28,7 @@ meadian =: 0.5&(cdf^:_1)
 
 NB. dyad producing adverb where u is statistic, x is resample, y is sample
 bssi=: 1 : 0
-  s=. u"1 x
-  (mean s) -`[`+`:0 (stddev s) * qnorm -. -: bs_a
+  (mean s) -`[`+`:0 (stddev s=. u"1 x) * qnorm -. -: bs_a
 )
 
 NB. monad producing adverb where u is statistic, y is sample, and x is resample.
@@ -41,7 +40,7 @@ NB. monad producing adverb where u is statistic and y is sample.
 bsbc=: 1 : 0
   z0=. qnorm p0=. (that =. u y) cdf resamp=. u"1 x
   I=. pnorm (+: z0) + qnorm (,-.) -: bs_a
-  ({.,that,{:) I quantile samp
+  ({.,that,{:) I (cdf^:_1) samp
 )
 
 NB. dyad producing adverb where u is statistic and y is sample and x is resample
@@ -49,7 +48,7 @@ bsbca=: 1 : 0
   thati=. (1 u \. y) - that =. u y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
   z0qt=. that cdf resamp=. u"1 x NB. u dobootstrap bs_B y
-  if. -. (0 < z0qt) *. z0qt < 1 do. x u bspi y
+  if. -. (0 < z0qt) *. z0qt < 1 do. x u bssi y
   else. z0=. qnorm z0qt
         zabh=. z0 + (% 1 - ahat&*) z0 + qnorm (,-.) -: bs_a
         ({.,that,{:) (pnorm zabh) cdf^:_1 resamp
@@ -58,19 +57,8 @@ bsbca=: 1 : 0
 
 regress_bench=: +/\ %. 1 ,. i.@#
 rsquare_bench=: 3 : 0
-  v=. 1,.i.#y
-  d=. +/\ y
-  b=. d %. v
-  k=. <:{:$v
-  n=. $d
-  sst=. +/*:d-(+/d) % #d
-  sse=. +/*:d-v +/ .* b
-  mse=. sse%n->:k
-  seb=. %:({.mse)*(<0 1)|:%.(|:v) +/ .* v
-  ssr=. sst-sse
-  msr=. ssr%k
-  rsq=. ssr%sst
-  rsq
+  b=. (y=.+/\y) %. v=. 1,.i.#y
+  (sst-+/*:y-v +/ .* b)% sst=. +/*:y-(+/y) % n=. #y
 )
 
 se2_t=: +&%&# * +&ssdev % +&#-2:
@@ -84,23 +72,6 @@ bs_t=: 4 : 0
 )
 
 bs_compare=: bs_t & dobench
-
-NB. bonsai_plotted =: 3 : 0
-NB. resamp=. bs_B dobootstrap samp=. dobench y
-NB. N =. # samp
-NB. 'rlo rmi rhi'=. resamp ({:@regress_bench) bs_est samp
-NB. pd 'reset;xcaption runs; ycaption time; title bonsai'
-NB. pd 'subtitle ''',y,'''; subtitlecolor snow'
-NB. pd 'backcolor black; labelcolor snow; captioncolor snow; titlecolor snow'
-NB. pd 'axiscolor snow; labelcolor snow; captioncolor snow'
-NB. pd 'color 78 233 215;type dot; pensize 0.6'
-NB. pd samp ;~ 1 + i. N
-NB. pd 'color 195 173 240;type line; pensize 1.4'
-NB. pd (,~rlo) ;~ 1,N
-NB. pd (,~rmi) ;~ 1,N
-NB. pd (,~rhi) ;~ 1,N
-NB. pd 'show'
-NB. )
 
 NB. use bs bias corrected accelerated by default
 bs_est =: bsbca

@@ -150,8 +150,7 @@ normal distribution cdf.
 #+begin_src j :session :exports code
 NB. dyad producing adverb where u is statistic, x is resample, y is sample
 bssi=: 1 : 0
-  s=. u"1 x
-  (mean s) -`[`+`:0 (stddev s) * qnorm -. -: bs_a
+  (mean s) -`[`+`:0 (stddev s=. u"1 x) * qnorm -. -: bs_a
 )
 #+end_src
 
@@ -226,7 +225,7 @@ bsbca=: 1 : 0
   thati=. (1 u \. y) - that =. u y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
   z0qt=. that cdf resamp=. u"1 x NB. u dobootstrap bs_B y
-  if. -. (0 < z0qt) *. z0qt < 1 do. x u bspi y
+  if. -. (0 < z0qt) *. z0qt < 1 do. x u bssi y
   else. z0=. qnorm z0qt
         zabh=. z0 + (% 1 - ahat&*) z0 + qnorm (,-.) -: bs_a
         ({.,that,{:) (pnorm zabh) cdf^:_1 resamp
@@ -260,19 +259,8 @@ the original sample in unbiasing by its skewness.
  #+begin_src j :session :exports both
 regress_bench=: +/\ %. 1 ,. i.@#
 rsquare_bench=: 3 : 0
-  v=. 1,.i.#y
-  d=. +/\ y
-  b=. d %. v
-  k=. <:{:$v
-  n=. $d
-  sst=. +/*:d-(+/d) % #d
-  sse=. +/*:d-v +/ .* b
-  mse=. sse%n->:k
-  seb=. %:({.mse)*(<0 1)|:%.(|:v) +/ .* v
-  ssr=. sst-sse
-  msr=. ssr%k
-  rsq=. ssr%sst
-  rsq
+  b=. (y=.+/\y) %. v=. 1,.i.#y
+  (sst-+/*:y-v +/ .* b)% sst=. +/*:y-(+/y) % n=. #y
 )
  #+end_src
 
@@ -415,8 +403,6 @@ load 'plot stats/base stats/distribs'
 <<regression>>
 
 <<bootstrap-t>>
-
-NB. <<plotting>>
 
 <<analysis>>
 #+end_src
