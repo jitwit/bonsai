@@ -4,7 +4,7 @@ bs_tl   =: 1      NB. time alloted (upper bound on)
 bs_n_lo =: 5      NB. minimum sample
 bs_n_hi =: 2000   NB. maximum sample
 bs_a    =: 0.05   NB. coverage
-bs_B    =: 2000   NB. bootstrap resample
+bs_B    =: 3000   NB. bootstrap resample
 NB. current version in stats/base slow for this use case, whence:
 dev =: (- mean)`(-"_1 _ mean)@.(1 < #@$)
 
@@ -17,7 +17,7 @@ NB. x runbench y: measure time to execute sentence y x times.
 )
 
 dobootstrap=: 1 : 0
-NB. u doboostrap: redraw uniformly from sample y u times
+NB. u doboostrap: redraw uniformly from sample y u times.
   y {~ ? u # ,: $~ #y
 )
 
@@ -29,24 +29,24 @@ qtile =: 4 : 0
 cdf =: (+/ @: (<:/~) % #@]) :. qtile
 
 bssi=: 1 : 0
-NB. dyad producing adverb where u is statistic, x is resample, y is sample
+NB. x u bspi y: verb u is statistic, y is sample, x is resample.
   (mean s) -`[`+`:0 (stddev s=. u"1 x) * qnorm -. -: bs_a
 )
 
 bspi=: 1 : 0
-NB. monad producing adverb where u is statistic, y is sample, and x is resample.
+NB. x u bspi y: verb u is statistic, y is sample, x is resample.
   ((-:i.3) + (i:_1) * -:bs_a) cdf^:_1 u"1 x
 )
 
 bsbc=: 1 : 0
-NB. monad producing adverb where u is statistic and y is sample.
-  z0=. qnorm p0=. (that =. u y) cdf resamp=. u"1 x
+NB. x u bsbc y: verb u is statistic, y is sample, x is resample.
+  z0=. qnorm p0=. (that =. u y) cdf x
   I=. pnorm (+: z0) + qnorm (,-.) -: bs_a
   ({.,that,{:) I (cdf^:_1) samp
 )
 
 bsbca=: 1 : 0
-NB. dyad producing adverb where u is statistic and y is sample and x is resample
+NB. x u bsbca y: verb u is statistic, y is sample, and x is resample.
   thati=. (1 u \. y) - that =. u y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
   z0qt=. that cdf resamp=. u"1 x
@@ -68,6 +68,8 @@ se2_t=: +&%&# * +&ssdev % +&#-2:
 se_t=: %:@:se2_t
 
 bs_t=: 4 : 0
+NB. x bs_t y: use bootstrap-t to compare distributions of benchmark
+NB. results form sentences x and y.
   that=. x -&mean y
   sehat=. x se_t y
   samp=. x ((that -~ -&mean) % se_t)"1 & (bs_B dobootstrap) y
@@ -80,8 +82,7 @@ NB. use bs bias corrected accelerated by default
 bs_est =: bsbca
 
 bs_summarize =: 3 : 0
-NB. report some descriptive statistics about a single vector y of
-NB. benchmark results.
+NB. Report some descriptive statistics about a list y of benchmark results.
   samp=. y
   resamp=. bs_B dobootstrap y
   xbarc=. resamp mean bs_est samp
@@ -101,13 +102,12 @@ NB. ambivalent benchmarks
 NB. the program that goes second suffers performance... figure out
 NB. something better!
 bonsai=: 3 : 0
-NB. benchmark senetence y
+NB. Benchmark senetence y
   0 bonsai y
   :
-NB. benchmark sentences x and y and compare means. Until I figure out a fix
-NB. sentence y suffers in performance, so take that in to consideration.
-NB. Positive values of estimate lower means sentence x is likely slower
-NB. than sentence y
+NB. Benchmark sentences x and y and compare means.sentence y suffers a bit in
+NB. performance, so take that in to consideration. Positive values from
+NB. comparison mean sentence x is likely slower than sentence y.
   if. x do. 'sx sy'=. x ;&dobench y
 	    echo (;: 'comparison lower estimate upper') ,: '- & mean' ; <"0 sx bs_t sy
       	    echo bs_summarize sx
