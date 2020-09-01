@@ -2,9 +2,11 @@ load 'plot stats/base stats/distribs'
 
 bs_tl   =: 1      NB. time alloted (upper bound on)
 bs_n_lo =: 5      NB. minimum sample
-bs_n_hi =: 1000   NB. maximum sample
+bs_n_hi =: 2000   NB. maximum sample
 bs_a    =: 0.05   NB. coverage
 bs_B    =: 2000   NB. bootstrap resample
+NB. current version in stats/base slow for this use case, whence:
+dev =: (- mean)`(-"_1 _ mean)@.(1 < #@$)
 
 NB. monad taking prgram y to run a number of times based on configuration.
 NB. x runbench y measures time to execute y x times. 
@@ -48,9 +50,10 @@ bsbca=: 1 : 0
   thati=. (1 u \. y) - that =. u y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
   z0qt=. that cdf resamp=. u"1 x NB. u dobootstrap bs_B y
-  if. -. (0 < z0qt) *. z0qt < 1 do. x u bssi y
+  ab =. (,-.) -: bs_a
+  if. 1 ~: ab I. z0qt do. x u bspi y
   else. z0=. qnorm z0qt
-        zabh=. z0 + (% 1 - ahat&*) z0 + qnorm (,-.) -: bs_a
+        zabh=. z0 + (% 1 - ahat&*) z0 + qnorm ab
         ({.,that,{:) (pnorm zabh) cdf^:_1 resamp
   end.
 )

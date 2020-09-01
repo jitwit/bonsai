@@ -15,9 +15,9 @@ purpose as averaging destroys information and it takes a hit from
 initial interprative overhead. Light programs ~y~ thus require a large
 ~x~, before the results converge.
 
-*~bonsai~* uses is statistical bootstrapping, which enables the
-estimation of statistical parameters on nonparametric samples. I got
-the sense of what to look for from haskell's [[https://hackage.haskell.org/package/criterion][criterion]] package, and
+*~bonsai~* uses is statistical bootstrapping, which enables us to
+estimate statistical parameters on nonparametric samples. I got the
+sense of what to look for from haskell's [[https://hackage.haskell.org/package/criterion][criterion]] package, and
 learned the material for how to implement it through Efron and
 Hastie's textbook [[https://web.stanford.edu/~hastie/CASI/][Computer Age Statistical Inference]]. See chapters 10
 and 11 from there to get the original material.
@@ -81,9 +81,11 @@ confidence intervals and the number of bootstrap trials.
 #+begin_src j :exports code
 bs_tl   =: 1      NB. time alloted (upper bound on)
 bs_n_lo =: 5      NB. minimum sample
-bs_n_hi =: 1000   NB. maximum sample
+bs_n_hi =: 2000   NB. maximum sample
 bs_a    =: 0.05   NB. coverage
 bs_B    =: 2000   NB. bootstrap resample
+NB. current version in stats/base slow for this use case, whence:
+dev =: (- mean)`(-"_1 _ mean)@.(1 < #@$)
 #+end_src
 
 We gather an initial sample from ~dobench~ by first running the
@@ -225,9 +227,10 @@ bsbca=: 1 : 0
   thati=. (1 u \. y) - that =. u y
   ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
   z0qt=. that cdf resamp=. u"1 x NB. u dobootstrap bs_B y
-  if. -. (0 < z0qt) *. z0qt < 1 do. x u bssi y
+  ab =. (,-.) -: bs_a
+  if. 1 ~: ab I. z0qt do. x u bspi y
   else. z0=. qnorm z0qt
-        zabh=. z0 + (% 1 - ahat&*) z0 + qnorm (,-.) -: bs_a
+        zabh=. z0 + (% 1 - ahat&*) z0 + qnorm ab
         ({.,that,{:) (pnorm zabh) cdf^:_1 resamp
   end.
 )

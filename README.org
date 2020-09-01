@@ -4,6 +4,14 @@ Statistical benchmarking in J.
 
 See the [[http://j-raphael.net/posts/bonsai.html][documentation]] or browse the files here.
 
+** Installation
+
+Using pacman
+
+#+begin_src j :session :exports both
+install 'github:jitwit/bonsai@a'
+#+end_src
+
 ** Examples
 
 *** Monad
