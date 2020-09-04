@@ -1,10 +1,10 @@
-load 'plot stats/base stats/distribs'
+load 'stats/base stats/distribs'
 
 bs_tl   =: 1      NB. time alloted (upper bound on)
 bs_n_lo =: 5      NB. minimum sample
 bs_n_hi =: 2000   NB. maximum sample
 bs_a    =: 0.05   NB. coverage
-bs_B    =: 3000   NB. bootstrap resample
+bs_B    =: 2500   NB. bootstrap resample
 NB. current version in stats/base slow for this use case, whence:
 dev =: (- mean)`(-"_1 _ mean)@.(1 < #@$)
 
@@ -94,7 +94,7 @@ NB. Report some descriptive statistics about a list y of benchmark results.
   ests=. <"0 regac , rsqrc , xbarc , sdevc , skwnc ,: kurtc
   ests=. (;: 'lower estimate upper') , ests
 
-  rows=. ('N = ',":#samp);'ols';('R',u:16b00b2);'mean';'stddev';'skewness';'kurtosis'
+  rows=. ('N = ',":#samp);'ols';('R',u:16bb2);(u:16b3bc);(u:16b3c3);'skewness';'kurtosis'
   rows ,. ests
 )
 
@@ -105,8 +105,8 @@ bonsai=: 3 : 0
 NB. Benchmark senetence y
   0 bonsai y
   :
-NB. Benchmark sentences x and y and compare means.sentence y suffers a bit in
-NB. performance, so take that in to consideration. Positive values from
+NB. Benchmark sentences x and y and compare means. sentence y suffers a bit
+NB. in performance, so take that in to consideration. Positive values from
 NB. comparison mean sentence x is likely slower than sentence y.
   if. x do. 'sx sy'=. x ;&dobench y
 	    echo (;: 'comparison lower estimate upper') ,: '- & mean' ; <"0 sx bs_t sy
