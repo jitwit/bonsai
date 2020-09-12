@@ -78,7 +78,7 @@ runs. Additional configuration includes the target coverage for
 confidence intervals and the number of bootstrap trials.
 
 #+name: configuration
-#+begin_src j :exports code
+#+begin_src J :exports code
 bs_tl   =: 1      NB. time alloted (upper bound on)
 bs_n_lo =: 5      NB. minimum sample
 bs_n_hi =: 2000   NB. maximum sample
@@ -94,7 +94,7 @@ configuration. It's also possible to specify exactly how many times to
 run a benchmark by using it dyadically.
 
 #+name: sampling
-#+begin_src j :session :exports code
+#+begin_src J :session :exports code
 dobench=:  3 : 0
 NB. dobench y: run sentence y a number of times based on configuration.
   (bs_n_hi <. bs_n_lo >. >. bs_tl % 1e_6 >. 6!:2 y) dobench y
@@ -117,7 +117,7 @@ Discrete percentiles and quantiles are not in J's stats addon and can
 be computed as follows:
 
 #+name: quantile
-#+begin_src j :session :exports code
+#+begin_src J :session :exports code
 qtile =: 4 : 0
   ws=. (%+/)"1 -. | xs -"0 1 is=. (<.,>.)"0 xs=. x * <:#y
   ws (+/"1 @: *) is { /:~ y
@@ -149,7 +149,7 @@ bootstrapped standard error and asking for coverage based on the
 normal distribution cdf.
 
 #+name: standard-interval
-#+begin_src j :session :exports code
+#+begin_src J :session :exports code
 bssi=: 1 : 0
 NB. x u bspi y: verb u is statistic, y is sample, x is resample.
   (mean s) -`[`+`:0 (stddev s=. u"1 x) * qnorm -. -: bs_a
@@ -170,7 +170,7 @@ The next best way to go is to use percentiles on the emperical
 resamples to find our confidence.
 
 #+name: percentile
-#+begin_src j :session :exports code
+#+begin_src J :session :exports code
 bspi=: 1 : 0
 NB. x u bspi y: verb u is statistic, y is sample, x is resample.
   ((-:i.3) + (i:_1) * -:bs_a) cdf^:_1 u"1 x
@@ -191,7 +191,7 @@ mapping through the standard normal cdf $\Phi$ getting the desired
 coverage and then calculating percentiles.
 
 #+name: bias-percentile
-#+begin_src j :session :exports code
+#+begin_src J :session :exports code
 bsbc=: 1 : 0
 NB. x u bsbc y: verb u is statistic, y is sample, x is resample.
   z0=. qnorm p0=. (that =. u y) cdf x
@@ -221,7 +221,7 @@ some acceleration $a$ in $$ \hat \phi \sim N(\phi - z_0 \sigma_\phi,
 \sigma_\phi^2) \text { , with  } \sigma_\phi = 1 + a\phi$$
 
 #+name: bias-and-accelerated
-#+begin_src j :session :exports code
+#+begin_src J :session :exports code
 bsbca=: 1 : 0
 NB. x u bsbca y: verb u is statistic, y is sample, and x is resample.
   thati=. (1 u \. y) - that =. u y
@@ -259,7 +259,7 @@ the original sample in unbiasing by its skewness.
  snapshots of performance.
 
  #+name: regression
- #+begin_src j :session :exports both
+ #+begin_src J :session :exports both
 regress_bench=: +/\ %. 1 ,. i.@#
 rsquare_bench=: 3 : 0
   b=. (y=.+/\y) %. v=. 1,.i.#y
@@ -290,7 +290,7 @@ In
 J:
 
 #+name: bootstrap-t
-#+begin_src j :session :exports both
+#+begin_src J :session :exports both
 se2_t=: +&%&# * +&ssdev % +&#-2:
 se_t=: %:@:se2_t
 
@@ -323,7 +323,7 @@ bootstrap-t and reports some descriptive statistics for each. When
 used as a monad, it just outputs the descriptive statistics.
 
 #+name: analysis
-#+begin_src j :session :exports both
+#+begin_src J :session :exports both
 NB. use bs bias corrected accelerated by default
 bs_est =: bsbca
 
@@ -367,7 +367,7 @@ NB. comparison mean sentence x is likely slower than sentence y.
 ** Plotting
 
 #+name: plotting
-#+begin_src j :session :exports none
+#+begin_src J :session :exports none
 bonsai_plotted =: 3 : 0
 resamp=. bs_B dobootstrap samp=. dobench y
 N =. # samp
@@ -391,7 +391,7 @@ pd 'show'
 
 * Final Program
 
-#+begin_src j :session :tangle bonsai.ijs :noweb yes
+#+begin_src J :session :tangle bonsai.ijs :noweb yes
 load 'stats/base stats/distribs'
 
 <<configuration>>
