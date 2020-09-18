@@ -40,9 +40,10 @@ NB. x u bspi y: verb u is statistic, y is sample, x is resample.
 
 bsbc=: 1 : 0
 NB. x u bsbc y: verb u is statistic, y is sample, x is resample.
-  z0=. qnorm p0=. (that =. u y) cdf x
+  that =. u samp =. y
+  z0=. qnorm that cdf resamp =. u"1 x
   I=. pnorm (+: z0) + qnorm (,-.) -: bs_a
-  ({.,that,{:) I (cdf^:_1) samp
+  ({.,that,{:) I (cdf^:_1) resamp
 )
 
 bsbca=: 1 : 0
@@ -83,18 +84,18 @@ bs_est =: bsbca
 
 bs_summarize =: 3 : 0
 NB. Report some descriptive statistics about a list y of benchmark results.
-  samp=. y
-  resamp=. bs_B dobootstrap y
+  resamp=. bs_B dobootstrap samp=. y
   xbarc=. resamp mean bs_est samp
   sdevc=. resamp stddev bs_est samp
   regac=. resamp ({:@regress_bench) bs_est samp
   rsqrc=. resamp rsquare_bench bs_est samp
   skwnc=. resamp skewness bs_est samp
   kurtc=. resamp kurtosis bs_est samp
-  ests=. <"0 regac , rsqrc , xbarc , sdevc , skwnc ,: kurtc
+  ests=. <"0 regac , xbarc , sdevc , skwnc , kurtc ,: rsqrc
   ests=. (;: 'lower estimate upper') , ests
 
-  rows=. ('N = ',":#samp);'ols';('R',u:16bb2);(u:16b3bc);(u:16b3c3);'skewness';'kurtosis'
+  rows=. ('N = ',":#samp);'ols';(u:16b3bc);(u:16b3c3) 
+  rows=. rows,'skewness';'kurtosis';('R',(u:16bb2),' (ols)')
   rows ,. ests
 )
 

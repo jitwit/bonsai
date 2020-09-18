@@ -1,6 +1,5 @@
+load 'bonsai.ijs'
 
-eg=: '%. ? 200 200 $ 0'
+bs_est =: bsbca
+bonsai '+/ i. 20001'
 
-test=: 3 : 0
-0!:2 < 'test.ijs'
-)
