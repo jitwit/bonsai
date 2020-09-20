@@ -5,8 +5,6 @@ bs_n_lo =: 5      NB. minimum sample
 bs_n_hi =: 2000   NB. maximum sample
 bs_a    =: 0.05   NB. coverage
 bs_B    =: 2500   NB. bootstrap resample
-NB. current version in stats/base slow for this use case, whence:
-dev =: (- mean)`(-"_1 _ mean)@.(1 < #@$)
 
 dobench=:  3 : 0
 NB. dobench y: run sentence y a number of times based on configuration.
