@@ -60,7 +60,7 @@ NB. x u bsbca y: verb u is statistic, y is sample, and x is resample.
 regress_bench=: +/\ %. 1 ,. i.@#
 rsquare_bench=: 3 : 0
   b=. (y=.+/\y) %. v=. 1,.i.#y
-  (sst-+/*:y-v +/ .* b)% sst=. +/*:y-(+/y) % n=. #y
+  (sst-+/*:y-v +/ . * b)% sst=. +/*:y-(+/y) % n=. #y
 )
 
 se2_t=: +&%&# * +&ssdev % +&#-2:
@@ -87,13 +87,12 @@ NB. Report some descriptive statistics about a list y of benchmark results.
   sdevc=. resamp stddev bs_est samp
   regac=. resamp ({:@regress_bench) bs_est samp
   rsqrc=. resamp rsquare_bench bs_est samp
-  skwnc=. resamp skewness bs_est samp
-  kurtc=. resamp kurtosis bs_est samp
-  ests=. <"0 regac , xbarc , sdevc , skwnc , kurtc ,: rsqrc
+NB.  skwnc=. resamp skewness bs_est samp
+NB.  kurtc=. resamp kurtosis bs_est samp
+  ests=. <"0 regac , xbarc , sdevc ,: rsqrc
   ests=. (;: 'lower estimate upper') , ests
 
-  rows=. ('N = ',":#samp);'ols';(u:16b3bc);(u:16b3c3) 
-  rows=. rows,'skewness';'kurtosis';('R',(u:16bb2),' (ols)')
+  rows=. ('N = ',":#samp);(u:16b3bc);(u:16b3c3);'ols';('R',(u:16bb2),' (ols)')
   rows ,. ests
 )
 
