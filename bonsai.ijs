@@ -89,7 +89,7 @@ NB. Report some descriptive statistics about a list y of benchmark results.
   rsqrc=. resamp rsquare_bench bs_est samp
 NB.  skwnc=. resamp skewness bs_est samp
 NB.  kurtc=. resamp kurtosis bs_est samp
-  ests=. <"0 regac , xbarc , sdevc ,: rsqrc
+  ests=. <"0 xbarc , sdevc , regac ,: rsqrc
   ests=. (;: 'lower estimate upper') , ests
 
   rows=. ('N = ',":#samp);(u:16b3bc);(u:16b3c3);'ols';('R',(u:16bb2),' (ols)')
