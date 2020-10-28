@@ -362,6 +362,24 @@ NB. comparison mean sentence x is likely slower than sentence y.
 
 #+RESULTS: analysis
 
+** Printing Times
+
+#+name: printing
+#+begin_src J :session :exports both
+bsppns =: 'ns' ,~ [: ": [: <. 0.5 + 1e9&*
+bsppus =: ('s',~u:16b3bc) ,~ [: ": [: <. 0.5 + 1e6&*
+bsppms =: 'ms' ,~ [: ": [: <. 0.5 + 1e3&*
+bspps =: 's' ,~ [: ": (100 %~ [: <. 0.5 + 100&*)
+bsppa =: bsppns`bsppus`bsppms`bspps@.(_6 _3 0 I. 10&^.)
+bsnump =: 1 4 8 e.~ 3!:0
+bspp =: u: @ bsppa ^: bsnump
+
+bonsaipp =: 3 : 0
+ res =. bonsai y
+ ({: res) ,~ bspp &.> }: res
+)
+#+end_src
+
 ** Plotting
 
 #+name: plotting
@@ -409,6 +427,8 @@ load 'stats/base stats/distribs'
 <<regression>>
 
 <<bootstrap-t>>
+
+<<printing>>
 
 <<analysis>>
 #+end_src

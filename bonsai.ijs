@@ -77,6 +77,19 @@ NB. results form sentences x and y.
 
 bs_compare=: bs_t & dobench
 
+bsppns =: 'ns' ,~ [: ": [: <. 0.5 + 1e9&*
+bsppus =: ('s',~u:16b3bc) ,~ [: ": [: <. 0.5 + 1e6&*
+bsppms =: 'ms' ,~ [: ": [: <. 0.5 + 1e3&*
+bspps =: 's' ,~ [: ": (100 %~ [: <. 0.5 + 100&*)
+bsppa =: bsppns`bsppus`bsppms`bspps@.(_6 _3 0 I. 10&^.)
+bsnump =: 1 4 8 e.~ 3!:0
+bspp =: u: @ bsppa ^: bsnump
+
+bonsaipp =: 3 : 0
+ res =. bonsai y
+ ({: res) ,~ bspp &.> }: res
+)
+
 NB. use bs bias corrected accelerated by default
 bs_est =: bsbca
 
