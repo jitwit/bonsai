@@ -116,11 +116,20 @@ NB.  kurtc=. resamp kurtosis bs_est samp
  rows ,. ests
 )
 
-bonsai=: 1 : 'summarize u dobench_bonsai_ y'
+bonsai3=: 1 : 'summarize u dobench_bonsai_ y'
+bonsai4 =: 1 : 0
+ table =. ;: 'comparison lower estimate upper'
+ table =. table ,: '- & mean' ; <"0 x bs_t & (u dobench_bonsai_) y
+)
+
 bonsai_z_ =: 3 : 0
+NB. bonsai y: estimate performance of sentence y
   loc =. coname''
-  loc bonsai_bonsai_ y
+  loc bonsai3_bonsai_ y
 :
+NB. x bonsai y: compare mean execution time of two sentences. a
+NB. positive estimate means sentence x takes longer to execute than
+NB. sentence y.
   loc =. coname ''
-  x loc bonsai_bonsai_ y
+  x loc bonsai4_bonsai_ y
 )

@@ -36,11 +36,14 @@ table31=: |: _2 ]\ table31
 NB. bspp 1e_5 1.2e_5 9e_3 7e_7 3.2
 NB. bonsaipp '%. ?. 50 50 $ 0'
 test=: 3 : 0
+ cocurrent 'bonsai'
  0!:2 test_cases
+ cocurrent 'base'
  echo '   test_locale '''''
  test_locale''
 )
 
 test''
 
-
+'+/ 1 + i. 200' bonsai '+/ i. 201'
+'+/ i. 201' bonsai '+/ 1 + i. 200'

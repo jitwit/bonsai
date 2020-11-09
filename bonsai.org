@@ -317,14 +317,10 @@ original sample, then bootstrapping the pivotal quantity $t*$.
 
 ** Analysis
 
-We default to using ~bsbca~ and estimate some descriptive statistics
-in ~summarize~. 
-
-# Verb ~bonsai~ is ambivalent, and
-# when used as a dyad benchmarks two sentences and compares their mean
-# execution times via bootstrap-t and reports some descriptive
-# statistics for each. When used as a monad, it just outputs the
-# descriptive statistics.
+Verb ~bonsai~ defaults to using ~bsbca~ and estimate some descriptive
+statistics in ~summarize~. ~bonsai~ is ambivalent and when used as a
+dyad benchmarks two sentences, comparing their mean execution times
+via bootstrap-t. As a monad, it outputs some descriptive statistics.
 
 #+name: analysis
 #+begin_src J :session :exports both
@@ -347,14 +343,24 @@ NB.  kurtc=. resamp kurtosis bs_est samp
  rows ,. ests
 )
 
-bonsai=: 1 : 'summarize u dobench_bonsai_ y'
-bonsai_z_ =: 3 : 0
-  loc =. coname''
-  loc bonsai_bonsai_ y
-:
-  loc =. coname ''
-  x loc bonsai_bonsai_ y
+bonsai3=: 1 : 'summarize u dobench_bonsai_ y'
+bonsai4 =: 1 : 0
+ table =. ;: 'comparison lower estimate upper'
+ table =. table ,: '- & mean' ; <"0 x bs_t & (u dobench_bonsai_) y
 )
+
+bonsai_z_ =: 3 : 0
+NB. bonsai y: estimate performance of sentence y
+  loc =. coname''
+  loc bonsai3_bonsai_ y
+:
+NB. x bonsai y: compare mean execution time of two sentences. a
+NB. positive estimate means sentence x takes longer to execute than
+NB. sentence y.
+  loc =. coname ''
+  x loc bonsai4_bonsai_ y
+)
+
 #+end_src
 
 #+RESULTS: analysis
