@@ -1,18 +1,18 @@
 coclass 'bonsai'
 load 'stats/base stats/distribs'
 
-bs_tl   =: 1      NB. time alloted (upper bound on)
-bs_n_lo =: 5      NB. minimum sample
-bs_n_hi =: 2000   NB. maximum sample
-bs_a    =: 0.05   NB. coverage
-bs_B    =: 2500   NB. bootstrap resample
+time  =: 1      NB. time alloted (upper bound on)
+lo    =: 5      NB. minimum sample
+hi    =: 2000   NB. maximum sample
+alpha =: 0.05   NB. coverage
+B     =: 2500   NB. bootstrap resample
 
 dobench=:  1 : 0
 NB. u dobench y: run sentence y a number of times based on
 NB. configuration. u is the locale where the sentence was called from,
 NB. which is captured in the top level bonsai verb.
  cocurrent u
- t0 =. (bs_n_hi_bonsai_ <. bs_n_lo_bonsai_ >. >. bs_tl_bonsai_ % 1e_6 >. 6!:2 y)
+ t0 =. (hi_bonsai_ <. lo_bonsai_ >. >. time_bonsai_ % 1e_6 >. 6!:2 y)
  xs =. 6!:2"1 t0 # ,: y
  cocurrent 'bonsai' NB. apparently u would otherwise stick during
 		    NB. execution of other verbs (eg summarize)
@@ -33,19 +33,19 @@ cdf =: (+/ @: (<:/~) % #@]) :. qtile
 
 bssi=: 1 : 0
 NB. x u bspi y: verb u is statistic, y is sample, x is resample.
- (mean s) -`[`+`:0 (stddev s=. u"1 x) * qnorm -. -: bs_a
+ (mean s) -`[`+`:0 (stddev s=. u"1 x) * qnorm -. -: alpha
 )
 
 bspi=: 1 : 0
 NB. x u bspi y: verb u is statistic, y is sample, x is resample.
- ((-:i.3) + (i:_1) * -:bs_a) cdf^:_1 u"1 x
+ ((-:i.3) + (i:_1) * -:alpha) cdf^:_1 u"1 x
 )
 
 bsbc=: 1 : 0
 NB. x u bsbc y: verb u is statistic, y is sample, x is resample.
  that =. u samp =. y
  z0=. qnorm that cdf resamp =. u"1 x
- I=. pnorm (+: z0) + qnorm (,-.) -: bs_a
+ I=. pnorm (+: z0) + qnorm (,-.) -: alpha
  ({.,that,{:) I (cdf^:_1) resamp
 )
 
@@ -54,7 +54,7 @@ NB. x u bsbca y: verb u is statistic, y is sample, and x is resample.
  thati=. (1 u \. y) - that =. u y
  ahat=. 1r6 * (+/thati^3) % (+/*:thati)^3r2
  z0qt=. that cdf resamp=. u"1 x
- ab =. (,-.) -: bs_a
+ ab =. (,-.) -: alpha
  if. 1 ~: ab I. z0qt do. x u bspi y
  else. z0=. qnorm z0qt
        zabh=. z0 + (% 1 - ahat&*) z0 + qnorm ab
@@ -76,8 +76,8 @@ NB. x bs_t y: use bootstrap-t to compare distributions of benchmark
 NB. results form sentences x and y.
  that=. x -&mean y
  sehat=. x se_t y
- samp=. x ((that -~ -&mean) % se_t)"1 & (bs_B dobootstrap) y
- ({.,that,{:) that - sehat * ((,~-.) -: bs_a) cdf^:_1 samp
+ samp=. x ((that -~ -&mean) % se_t)"1 & (B dobootstrap) y
+ ({.,that,{:) that - sehat * ((,~-.) -: alpha) cdf^:_1 samp
 )
 
 bs_compare=: bs_t & dobench
@@ -100,9 +100,9 @@ bonsaipp =: 3 : 0
 NB. use bs bias corrected accelerated by default
 bs_est =: bsbca
 
-bs_summarize =: 3 : 0
+summarize =: 3 : 0
 NB. Report some descriptive statistics about a list y of benchmark results.
- resamp=. bs_B dobootstrap samp=. y
+ resamp=. B dobootstrap samp=. y
  xbarc=. resamp mean bs_est samp
  sdevc=. resamp stddev bs_est samp
  regac=. resamp ({:@regress_bench) bs_est samp
@@ -116,7 +116,7 @@ NB.  kurtc=. resamp kurtosis bs_est samp
  rows ,. ests
 )
 
-bonsai=: 1 : 'bs_summarize u dobench_bonsai_ y'
+bonsai=: 1 : 'summarize u dobench_bonsai_ y'
 bonsai_z_ =: 3 : 0
   loc =. coname''
   loc bonsai_bonsai_ y

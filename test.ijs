@@ -19,16 +19,11 @@ NB. printing
 '5.32s' -: bspp 5.321
 )
 
-test=: {{0!:2 test_cases}}
-
 test_locale =: 3 : 0
-  coclass 'tloc'
-  func =: +/@i.
-  echo coname''
-  echo bonsai 'func 201'
-  cocurrent 'base'
-  echo coname ''
-  assert. 1 = (bonsai :: 1:) 'func 201' NB. should error
+ coclass 'tloc'
+ func =: +/@i.
+ bonsai 'func 201'
+ 1 assert. 1 = (bonsai :: 1:) 'func 201' [ cocurrent 'base'
 )
 
 demo3 =: {{bonsai '%. ? 50 50 $ 0'}}            NB. monad demo
@@ -40,6 +35,10 @@ table31=: |: _2 ]\ table31
 
 NB. bspp 1e_5 1.2e_5 9e_3 7e_7 3.2
 NB. bonsaipp '%. ?. 50 50 $ 0'
+test=: 3 : 0
+ 0!:2 test_cases
+ echo '   test_locale '''''
+ test_locale''
+)
 
 test''
-test_locale''
