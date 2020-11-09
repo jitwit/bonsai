@@ -8,9 +8,9 @@ alpha =: 0.05   NB. coverage
 B     =: 2500   NB. bootstrap resample
 
 dobench=:  1 : 0
-NB. u dobench y: run sentence y a number of times based on
+NB. u dobench y: run sentence y a number of times based on the
 NB. configuration. u is the locale where the sentence was called from,
-NB. which is captured in the top level bonsai verb.
+NB. which is captured in the bonsai verb.
  cocurrent u
  t0 =. (hi_bonsai_ <. lo_bonsai_ >. >. time_bonsai_ % 1e_6 >. 6!:2 y)
  xs =. 6!:2"1 t0 # ,: y

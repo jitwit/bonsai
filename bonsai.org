@@ -94,9 +94,9 @@ run a benchmark by using it dyadically.
 #+name: sampling
 #+begin_src J :session :exports code
 dobench=:  1 : 0
-NB. u dobench y: run sentence y a number of times based on
+NB. u dobench y: run sentence y a number of times based on the
 NB. configuration. u is the locale where the sentence was called from,
-NB. which is captured in the top level bonsai verb.
+NB. which is captured in the bonsai verb.
  cocurrent u
  t0 =. (hi_bonsai_ <. lo_bonsai_ >. >. time_bonsai_ % 1e_6 >. 6!:2 y)
  xs =. 6!:2"1 t0 # ,: y
@@ -317,13 +317,14 @@ original sample, then bootstrapping the pivotal quantity $t*$.
 
 ** Analysis
 
-We default to the most sophisticated confidence measurement ~bsbca~
-and estimate some descriptive statistics in ~summarize~. This is a
-early draft and I'd like to build out some functionality for plotting
-results. Verb ~bonsai~ is ambivalent, and when used as a dyad
-benchmarks two sentences and compares their mean execution times via
-bootstrap-t and reports some descriptive statistics for each. When
-used as a monad, it just outputs the descriptive statistics.
+We default to using ~bsbca~ and estimate some descriptive statistics
+in ~summarize~. 
+
+# Verb ~bonsai~ is ambivalent, and
+# when used as a dyad benchmarks two sentences and compares their mean
+# execution times via bootstrap-t and reports some descriptive
+# statistics for each. When used as a monad, it just outputs the
+# descriptive statistics.
 
 #+name: analysis
 #+begin_src J :session :exports both
