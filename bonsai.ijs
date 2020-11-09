@@ -1,3 +1,4 @@
+coclass 'bonsai'
 load 'stats/base stats/distribs'
 
 bs_tl   =: 1      NB. time alloted (upper bound on)
@@ -6,12 +7,16 @@ bs_n_hi =: 2000   NB. maximum sample
 bs_a    =: 0.05   NB. coverage
 bs_B    =: 2500   NB. bootstrap resample
 
-dobench=:  3 : 0
-NB. dobench y: run sentence y a number of times based on configuration.
- (bs_n_hi <. bs_n_lo >. >. bs_tl % 1e_6 >. 6!:2 y) dobench y
-:
-NB. x runbench y: measure time to execute sentence y x times.
- 6!:2"1 x # ,: y
+dobench=:  1 : 0
+NB. u dobench y: run sentence y a number of times based on
+NB. configuration. u is the locale where the sentence was called from,
+NB. which is captured in the top level bonsai verb.
+ cocurrent u
+ t0 =. (bs_n_hi_bonsai_ <. bs_n_lo_bonsai_ >. >. bs_tl_bonsai_ % 1e_6 >. 6!:2 y)
+ xs =. 6!:2"1 t0 # ,: y
+ cocurrent 'bonsai' NB. apparently u would otherwise stick during
+		    NB. execution of other verbs (eg summarize)
+ xs
 )
 
 dobootstrap=: 1 : 0
@@ -111,19 +116,11 @@ NB.  kurtc=. resamp kurtosis bs_est samp
  rows ,. ests
 )
 
-NB. ambivalent benchmarks
-NB. the program that goes second suffers performance... figure out
-NB. something better!
-bonsai=: 3 : 0
-NB. Benchmark senetence y
- 0 bonsai y
+bonsai=: 1 : 'bs_summarize u dobench_bonsai_ y'
+bonsai_z_ =: 3 : 0
+  loc =. coname''
+  loc bonsai_bonsai_ y
 :
-NB. Benchmark sentences x and y and compare means. sentence y suffers a bit
-NB. in performance, so take that in to consideration. Positive values from
-NB. comparison mean sentence x is likely slower than sentence y.
- if. x do. 'sx sy'=. x ;&dobench y
-	    echo (;: 'comparison lower estimate upper') ,: '- & mean' ; <"0 sx bs_t sy
-     	    echo bs_summarize sx
-	    echo bs_summarize sy
- else. bs_summarize dobench y end.
+  loc =. coname ''
+  x loc bonsai_bonsai_ y
 )
