@@ -82,8 +82,8 @@ NB. results form sentences x and y.
  ybar =. sy mean bs_est y
  dsamp=. sx ((that -~ -&mean) % se_t)"1 sy
  ths =. ({.,that,{:) that - sehat * ((,~-.) -: alpha) cdf^:_1 dsamp
- err =. xbar (-~ % [) ybar
- ths , xbar , ybar ,: err
+ xvy =. xbar (-~%[) ybar
+ ths , xbar , ybar ,: xvy
 )
 
 bs_compare=: bs_t & dobench
@@ -131,7 +131,7 @@ bonsai4 =: 1 : 0
  x =. u dobench_bonsai_ x
  y =. u dobench_bonsai_ y
  x_y =. x bs_t y
- table =. table , (('- & ',mu);(mu,'(x)');(mu,'(y)');'x v. y %') ,. <"0 x_y
+ table =. table , (('- & ',mu);(mu,'(x)');(mu,'(y)');'x (-~%[) y') ,. <"0 x_y
 )
 
 bonsai_z_ =: 3 : 0
