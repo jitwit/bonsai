@@ -46,4 +46,6 @@ test=: 3 : 0
 test''
 
 '+/ 1 + i. 200' bonsai '+/ i. 201'
+
 '+/ i. 201' bonsai '+/ 1 + i. 200'
+demo4''

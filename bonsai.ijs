@@ -76,8 +76,14 @@ NB. x bs_t y: use bootstrap-t to compare distributions of benchmark
 NB. results form sentences x and y.
  that=. x -&mean y
  sehat=. x se_t y
- samp=. x ((that -~ -&mean) % se_t)"1 & (B dobootstrap) y
- ({.,that,{:) that - sehat * ((,~-.) -: alpha) cdf^:_1 samp
+ sx =. B dobootstrap x
+ sy =. B dobootstrap y
+ xbar =. sx mean bs_est x
+ ybar =. sy mean bs_est y
+ dsamp=. sx ((that -~ -&mean) % se_t)"1 sy
+ ths =. ({.,that,{:) that - sehat * ((,~-.) -: alpha) cdf^:_1 dsamp
+ err =. xbar (-~ % [) ybar
+ ths , xbar , ybar ,: err
 )
 
 bs_compare=: bs_t & dobench
@@ -100,26 +106,32 @@ bonsaipp =: 3 : 0
 NB. use bs bias corrected accelerated by default
 bs_est =: bsbca
 
+mu =: u: 16b3bc
+delta =: u: 16b3c3
+
 summarize =: 3 : 0
 NB. Report some descriptive statistics about a list y of benchmark results.
  resamp=. B dobootstrap samp=. y
  xbarc=. resamp mean bs_est samp
  sdevc=. resamp stddev bs_est samp
- regac=. resamp ({:@regress_bench) bs_est samp
- rsqrc=. resamp rsquare_bench bs_est samp
+NB. regac=. resamp ({:@regress_bench) bs_est samp
+NB. rsqrc=. resamp rsquare_bench bs_est samp
 NB.  skwnc=. resamp skewness bs_est samp
 NB.  kurtc=. resamp kurtosis bs_est samp
- ests=. <"0 xbarc , sdevc , regac ,: rsqrc
+ ests=. <"0 xbarc ,: sdevc NB. , regac ,: rsqrc
  ests=. (;: 'lower estimate upper') , ests
 
- rows=. ('N = ',":#samp);(u:16b3bc);(u:16b3c3);'ols';('R',(u:16bb2),' (ols)')
+ rows=. ('N = ',":#samp);mu;delta NB. ;'ols';('R',(u:16bb2),' (ols)')
  rows ,. ests
 )
 
 bonsai3=: 1 : 'summarize u dobench_bonsai_ y'
 bonsai4 =: 1 : 0
  table =. ;: 'comparison lower estimate upper'
- table =. table ,: '- & mean' ; <"0 x bs_t & (u dobench_bonsai_) y
+ x =. u dobench_bonsai_ x
+ y =. u dobench_bonsai_ y
+ x_y =. x bs_t y
+ table =. table , (('- & ',mu);(mu,'(x)');(mu,'(y)');'x v. y %') ,. <"0 x_y
 )
 
 bonsai_z_ =: 3 : 0
