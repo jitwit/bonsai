@@ -27,7 +27,7 @@ test_locale =: 3 : 0
 )
 
 demo3 =: {{bonsai '%. ? 50 50 $ 0'}}            NB. monad demo
-demo4 =: {{'e. i. 1000' bonsai '=/ i. 1000'}}   NB. dyad  demo
+demo4 =: {{'e. i. 1000' bonsai '= i. 1000'}}    NB. dyad  demo
 
 table31=: 7 51 44 69 49 41 59 70 34 42 46 40 0 40 32 45 49 57 52 64 44 61
 table31=: table31,36 59 42 60 5 30 22 58 18 51 41 63 48 38 31 42 42 69 46 49 63 63
