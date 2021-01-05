@@ -126,16 +126,36 @@ qtile =: 4 : 0
 )
 
 cdf =: (+/ @: (<:/~) % #@]) :. qtile
+
+IQR =: -/ @: (0.75 0.25&qtile)
 #+end_src
 
 #+RESULTS: quantile
 
-The local variables ~is~ and ~ws~ are used to interpolate between
-values at neighboring indices so that for example ~0.5 (cdf^:_1) 0 3~
-and ~median 0 3~ agree and are both ~1.5~. Declaring this as a
-function with obverse is cute but technically these verbs are not
-valid obverses. Anyway, the delcared obverse counts how many elements
-of ~y~ are less than or equal to ~x~.
+The local variables ~is~ and ~ws~ in ~qtile~ are used to interpolate
+between values at neighboring indices so that for example ~0.5
+(cdf^:_1) 0 3~ and ~median 0 3~ agree and are both ~1.5~. The obverse
+counts how many elements of ~y~ are less than or equal to ~x~. ~IQR~
+is the interquartile range.
+
+* KDE
+
+For visualization purposes, here is some basic functionality for
+calculating [[https://en.wikipedia.org/wiki/Kernel_density_estimation][kernel density estimates]] given a benchmark.
+
+#+name: kde
+#+begin_src J :session :exports both
+bandwidth =: 0.9 * (stddevp * 5 %: 4r3 % #) NB. <. (0.746269 * IQR)
+
+kde =: 2 : 0
+NB. n sample, u kernel, y point
+ (h%#n) * +/ u (y - n) * h =. % bandwidth n
+)
+NB. standard normal pdf & epanechnikov kernels
+phi =: (%:%2p1) * [: ^ _0.5 * *:
+epanechnikov =: 3r4 * 0 >. 1 - *:
+#+end_src
+
 
 * Bootstrapping Confidence
 
@@ -403,21 +423,18 @@ bonsaipp =: 3 : 0
 
 #+name: plotting
 #+begin_src J :session :exports none
-bonsai_plotted =: 3 : 0
-resamp=. B dobootstrap samp=. dobench y
-N =. # samp
-'rlo rmi rhi'=. resamp ({:@regress_bench) bs_est samp
-pd 'reset;xcaption runs; ycaption time; title bonsai'
-pd 'subtitle ''',y,'''; subtitlecolor snow'
-pd 'backcolor black; labelcolor snow; captioncolor snow; titlecolor snow'
-pd 'axiscolor snow; labelcolor snow; captioncolor snow'
-pd 'color 78 233 215;type dot; pensize 0.6'
-pd samp ;~ 1 + i. N
-pd 'color 195 173 240;type line; pensize 1.4'
-pd (,~rlo) ;~ 1,N
-pd (,~rmi) ;~ 1,N
-pd (,~rhi) ;~ 1,N
-pd 'show'
+bonsaiplot_z_ =: 3 : 0
+NB. plot kde of benchmark of sentence y
+ pd 'reset; visible 0;title ',y
+ pd 'xcaption time;ycaption kde & sample over time'
+ 'a b' =. (<./,>./) samp =. (coname'') dobench_bonsai_ y
+ den =. (epanechnikov kde samp)"0 pts =. (-:a+b) + ((%~i:)1000) * 0.6*b-a
+ pd 'type dot;pensize 0.3;color 80 100 200'
+ pd samp;(>./den)*(%~i.)#samp
+ pd 'type line; pensize 2;color 0 120 240'
+ pd pts;den
+ pd 'key sample density; keycolor 80 100 200,0 120 240;keypos top right'
+ pd'show'
 )
 #+end_src
 
@@ -435,6 +452,8 @@ load 'stats/base stats/distribs'
 
 <<quantile>>
 
+<<kde>>
+
 <<standard-interval>>
 
 <<percentile>>
@@ -448,6 +467,8 @@ load 'stats/base stats/distribs'
 <<bootstrap-t>>
 
 <<printing>>
+
+<<plotting>>
 
 <<analysis>>
 #+end_src

@@ -31,6 +31,18 @@ qtile =: 4 : 0
 
 cdf =: (+/ @: (<:/~) % #@]) :. qtile
 
+IQR =: -/ @: (0.75 0.25&qtile)
+
+bandwidth =: 0.9 * (stddevp * 5 %: 4r3 % #) NB. <. (0.746269 * IQR)
+
+kde =: 2 : 0
+NB. n sample, u kernel, y point
+ (h%#n) * +/ u (y - n) * h =. % bandwidth n
+)
+NB. standard normal pdf & epanechnikov kernels
+phi =: (%:%2p1) * [: ^ _0.5 * *:
+epanechnikov =: 3r4 * 0 >. 1 - *:
+
 bssi=: 1 : 0
 NB. x u bspi y: verb u is statistic, y is sample, x is resample.
  (mean s) -`[`+`:0 (stddev s=. u"1 x) * qnorm -. -: alpha
@@ -101,6 +113,20 @@ bonsaipp =: 3 : 0
  NB. with monadic bonsai usage, pretty print the results
  res =. bonsai y
  (u:@":) ^: (-.@bsucp) &.> ({: res) ,~ bspp &.> }: res
+)
+
+bonsaiplot_z_ =: 3 : 0
+NB. plot kde of benchmark of sentence y
+ pd 'reset; visible 0;title ',y
+ pd 'xcaption time;ycaption kde & sample over time'
+ 'a b' =. (<./,>./) samp =. (coname'') dobench_bonsai_ y
+ den =. (epanechnikov kde samp)"0 pts =. (-:a+b) + ((%~i:)1000) * 0.6*b-a
+ pd 'type dot;pensize 0.3;color 80 100 200'
+ pd samp;(>./den)*(%~i.)#samp
+ pd 'type line; pensize 2;color 0 120 240'
+ pd pts;den
+ pd 'key sample density; keycolor 80 100 200,0 120 240;keypos top right'
+ pd'show'
 )
 
 NB. use bs bias corrected accelerated by default
