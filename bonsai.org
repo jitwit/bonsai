@@ -422,7 +422,7 @@ bonsaipp =: 3 : 0
 ** Plotting
 
 #+name: plotting
-#+begin_src J :session :exports none
+#+begin_src J :session :exports code
 bonsaiplot_z_ =: 3 : 0
 NB. plot kde of benchmark of sentence y
  pd 'reset; visible 0;title ',y
