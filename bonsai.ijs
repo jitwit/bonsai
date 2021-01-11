@@ -118,7 +118,7 @@ bonsaipp =: 3 : 0
 bonsaiplot_z_ =: 3 : 0
 NB. plot kde of benchmark of sentence y
  require 'plot'
- pd 'reset; visible 0;title ',y
+ pd 'reset; visible 0;title bonsai'
  pd 'xcaption time;ycaption kde & sample over time'
  'a b' =. (<./,>./) samp =. (coname'') dobench_bonsai_ y
  den =. (epanechnikov kde samp)"0 pts =. (-:a+b) + ((%~i:)1000) * 0.6*b-a
