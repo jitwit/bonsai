@@ -2,8 +2,6 @@
 
 Statistical benchmarking in J.
 
-See the [[http://j-raphael.net/posts/bonsai.html][documentation]] or browse the files here.
-
 ** Installation
 
 Using pacman
