@@ -1,0 +1,4 @@
+iterative burn-in... do at least two rounds of a warmup loop whereby
+the number of test iterations doubles each time to try and get a good
+initial estimate of the mean execution time. then run a bunch of
+iterations in the main performance test loop.

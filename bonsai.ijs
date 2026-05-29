@@ -1,11 +1,11 @@
 coclass 'bonsai'
 load 'stats/base stats/distribs'
 
-time  =: 1      NB. time alloted (upper bound on)
+time  =: 3      NB. time alloted (upper bound on)
 lo    =: 5      NB. minimum sample
-hi    =: 2000   NB. maximum sample
+hi    =: 5000   NB. maximum sample
 alpha =: 0.05   NB. coverage
-B     =: 2500   NB. bootstrap resample
+B     =: 10000  NB. bootstrap resample
 
 dobench=:  1 : 0
 NB. u dobench y: run sentence y a number of times based on the

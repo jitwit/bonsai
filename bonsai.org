@@ -79,11 +79,11 @@ confidence intervals and the number of bootstrap trials.
 
 #+name: configuration
 #+begin_src J :exports code
-time  =: 1      NB. time alloted (upper bound on)
+time  =: 3      NB. time alloted (upper bound on)
 lo    =: 5      NB. minimum sample
-hi    =: 2000   NB. maximum sample
+hi    =: 5000   NB. maximum sample
 alpha =: 0.05   NB. coverage
-B     =: 2500   NB. bootstrap resample
+B     =: 10000  NB. bootstrap resample
 #+end_src
 
 We gather an initial sample from ~dobench~ by first running the
